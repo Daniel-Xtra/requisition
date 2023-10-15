@@ -1,0 +1,236 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Requisition",
+    "termsOfService": "",
+    "contact": {
+      "email": ""
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/api/v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Admin"
+    }
+  ],
+  "path": {},
+  "components": {
+    "schemas": {
+      "serverErrorResponse": {
+        "title": "Server Error Response",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "err": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "status": 500,
+          "message": "Something Went Wrong",
+          "err": "Error"
+        }
+      },
+      "badRequestResponse": {
+        "title": "Bad Request Response",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "validationErrors": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "status": 400,
+          "message": "Something Went Wrong",
+          "validationErrors": "Error"
+        }
+      },
+      "forbiddenResponse": {
+        "title": "Unauthorized Response",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "status": 401,
+          "message": "Unauthorized"
+        }
+      },
+      "noDataResponseObject": {
+        "title": "No Data Object Response",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "status": 404,
+          "message": "No Data Found",
+          "data": ""
+        }
+      },
+      "createdResponse": {
+        "title": "Created Response",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        "example": {
+          "status": 201,
+          "message": "Created",
+          "data": {}
+        }
+      },
+      "successResponseObject": {
+        "title": "Success Response",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        "example": {
+          "status": 200,
+          "message": "Successful",
+          "data": {}
+        }
+      }
+    },
+    "parameters": {
+      "AcceptLanguage": {
+        "name": "accept-language",
+        "in": "header",
+        "description": "Incase we want to send current language along our request",
+        "schema": {
+          "type": "string",
+          "default": "en"
+        }
+      },
+
+      "Email": {
+        "name": "email",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Code": {
+        "name": "c",
+        "required": true,
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Id": {
+        "name": "id",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "number"
+        }
+      },
+
+      "Slug": {
+        "name": "slug",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "per_page": {
+        "in": "query",
+        "name": "per_page",
+        "schema": {
+          "type": "number"
+        },
+        "description": "defines total data in one page"
+      },
+
+      "UniqueId": {
+        "name": "id",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        },
+        "description": "Unique Id"
+      },
+      "UserName": {
+        "name": "username",
+        "required": true,
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      },
+
+      "Page": {
+        "in": "query",
+        "name": "page",
+        "schema": {
+          "type": "number"
+        },
+        "description": "must be greater than zero"
+      }
+    },
+    "securitySchemes": {
+      "userAccessToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "userRefreshToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
