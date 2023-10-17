@@ -12,12 +12,6 @@ const Admin = new AdminController();
 // router.use(adminAuthorize);
 
 router.get(
-  "/home",
-  [adminAuthorize],
-  call(Admin.getAdminHome, (req, _res, _next) => [req.user])
-);
-
-router.get(
   "/manage-users",
   [adminAuthorize],
   call(Admin.getAllUsers, (req, _res, _next) => [

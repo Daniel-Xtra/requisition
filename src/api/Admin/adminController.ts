@@ -17,12 +17,6 @@ export class AdminController extends BaseController {
    * @param user
    */
 
-  public getAdminHome = async (user: IUser) => {
-    // responsible for get admin home
-    const admin_home = await this._adminService.getAdminHome(user);
-    return this.sendResponse(admin_home);
-  };
-
   public getAllUsers = async (
     user: IUser,
     per_page: number,

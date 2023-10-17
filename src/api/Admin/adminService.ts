@@ -1,6 +1,5 @@
 import { UserModel } from "../User/userModel";
 import { Op } from "sequelize";
-import moment from "moment";
 
 import { PROFILE_EXCLUDES } from "../../utils/helpers";
 import { ProfileModel } from "../Profile/profileModel";
@@ -18,35 +17,6 @@ export class AdminService {
    * @param {Object} user the current user
    * @memberof AdminController
    */
-
-  public getAdminHome = async (user: IUser) => {
-    // home screen for admin
-    const TODAY_START = new Date(new Date().setHours(0, 0, 0, 0));
-    const NOW = new Date();
-    let WEEK_AGO = new Date(
-      new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).setHours(
-        0,
-        0,
-        0,
-        0
-      )
-    );
-    let MONTH_AGO = new Date(
-      new Date(moment().subtract(1, "months").format()).setHours(0, 0, 0, 0)
-    );
-    let YEAR_AGO = new Date(
-      new Date(moment().subtract(1, "years").format()).setHours(0, 0, 0, 0)
-    );
-    const signups = await this.signups_details(
-      TODAY_START,
-      NOW,
-      WEEK_AGO,
-      MONTH_AGO,
-      YEAR_AGO
-    );
-
-    return { signups };
-  };
 
   /**
    * Get All Users
@@ -180,69 +150,6 @@ export class AdminService {
    * @returns user_counts on success
    * @memberof AdminController
    */
-
-  public signups_details = async (
-    TODAY_START: any,
-    NOW: any,
-    WEEK_AGO: any,
-    MONTH_AGO: any,
-    YEAR_AGO: any
-  ) => {
-    // count total_users by membership_type
-    let total_users = await UserModel.count({
-      where: {
-        membership_type: {
-          [Op.eq]: "user",
-        },
-      },
-    });
-
-    // count total signups today by created_at time
-    let total_signups_today = await UserModel.count({
-      where: {
-        created_at: {
-          [Op.gt]: TODAY_START,
-          [Op.lt]: NOW,
-        },
-      },
-    });
-    // count total_signup_week by created_at time
-    let total_signups_week = await UserModel.count({
-      where: {
-        created_at: {
-          [Op.gt]: WEEK_AGO,
-          [Op.lt]: NOW,
-        },
-      },
-    });
-    // count total_signup_month by created_at time
-    let total_signups_month = await UserModel.count({
-      where: {
-        created_at: {
-          [Op.gt]: MONTH_AGO,
-          [Op.lt]: NOW,
-        },
-      },
-    });
-    // count total_signup_year by created_at time
-    let total_signups_year = await UserModel.count({
-      where: {
-        created_at: {
-          [Op.gt]: YEAR_AGO,
-          [Op.lt]: NOW,
-        },
-      },
-    });
-    const user_counts = {
-      total_users,
-
-      total_signups_today,
-      total_signups_weekAgo: total_signups_week,
-      total_signups_monthAgo: total_signups_month,
-      total_signups_yearAgo: total_signups_year,
-    };
-    return user_counts;
-  };
 
   /**
    * Create a new slug (unique url string) for the post

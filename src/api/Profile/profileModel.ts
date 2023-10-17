@@ -10,34 +10,7 @@ ProfileModel.init(
     profile_picture_url: {
       type: Sequelize.STRING(120),
     },
-    relationship_status: {
-      type: Sequelize.STRING(120),
-    },
-    occupation: {
-      type: Sequelize.STRING(120),
-    },
-    highest_education: {
-      type: Sequelize.STRING(120),
-    },
-    current_education: {
-      type: Sequelize.STRING(120),
-    },
-    bio: {
-      type: Sequelize.STRING(120),
-    },
-    location: {
-      type: Sequelize.STRING(120),
-    },
-    facebook_url: {
-      type: Sequelize.STRING(120),
-    },
-    twitter_url: {
-      type: Sequelize.STRING(120),
-    },
-    instagram_url: {
-      type: Sequelize.STRING(120),
-    },
-    snapchat_id: {
+    current_position: {
       type: Sequelize.STRING(120),
     },
   },
