@@ -130,7 +130,7 @@ export class AuthService {
    */
 
   public async generateToken(user: IUser) {
-    const body = { id: user.id, username: user.username };
+    const body = { id: user.id, email: user.email };
     // generate jwt access token using jwt_secret
     const token = jwt.sign({ user: body }, JWT_SECRET, { expiresIn: "180d" });
     return token;
@@ -146,7 +146,7 @@ export class AuthService {
    */
 
   public async generateRefreshToken(user: IUser) {
-    const body = { id: user.id, username: user.username };
+    const body = { id: user.id, email: user.email };
     // generate jwt access token using jwt_secret
     const refreshToken = jwt.sign({ user: body }, JWT_SECRET_REFRESHTOKEN, {
       expiresIn: "365d",

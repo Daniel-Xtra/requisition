@@ -15,7 +15,7 @@ export const authorize = (req, res, next) => {
 
     try {
       const user = await UserModel.findOne({
-        where: { username: token.username },
+        where: { email: token.email },
       });
 
       if (!user) {

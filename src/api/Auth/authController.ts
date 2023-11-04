@@ -45,7 +45,7 @@ export class AuthController extends BaseController {
             user
           );
           // responsible for getting user details
-          const userData = await this._userService.getUser(user.username);
+          const userData = await this._userService.getUser(user.email);
 
           // send userData , accessToken and refreshToken in response
           resolve(
@@ -85,7 +85,7 @@ export class AuthController extends BaseController {
             user
           );
           // responsible for getting admin_user details
-          const userData = await this._userService.getUser(req.body.username);
+          const userData = await this._userService.getUser(req.body.email);
           // send admin_userData , accessToken and refreshToken in response
           resolve(this.sendResponse({ user: userData, token, refreshToken }));
         });
@@ -106,7 +106,7 @@ export class AuthController extends BaseController {
     // responsible for generating access token
     const accessToken = await this._authService.generateToken(user);
     // responsible for getting user details
-    const newUser = await this._userService.getUser(user.username);
+    const newUser = await this._userService.getUser(user.email);
     // responsible for generating refresh token
     const refreshToken = await this._authService.generateRefreshToken(user);
     // responsible for send mail after registered successfully

@@ -11,7 +11,7 @@ import { AppError } from "./../utils/app-error";
 import { ProfileModel } from "../api/Profile";
 import { IUserModel } from "../interfaces";
 import { Op } from "sequelize";
-import validator from "validator";
+//import validator from "validator";
 
 /**
  * This function is used for signup strategy
@@ -23,45 +23,32 @@ import validator from "validator";
 
 export const signupStrategy = new localStrategy(
   {
-    usernameField: "username",
+    usernameField: "email",
     passwordField: "password",
     passReqToCallback: true,
   },
-  async (req, username, password, done) => {
+  async (req, email, password, done) => {
     try {
       const body: any = _.pick(req.body, [
-        "username",
         "email",
         "phone_number",
         "first_name",
         "last_name",
         "gender",
-        "date_of_birth",
+        "membership_type",
+        "current_position",
       ]);
 
       // TODO: check for username , phone number and email address
       const checkDuplicateOrNot = await UserModel.findOne({
         where: {
-          [Op.or]: [
-            { username: body.username },
-            { email: body.email },
-            { phone_number: body.phone_number },
-          ],
+          [Op.or]: [{ email: body.email }, { phone_number: body.phone_number }],
         },
         raw: true,
       });
-      // if (checkDuplicateOrNot == null)
-      //   return done(
-      //     new AppError(
-      //       `Unable to register this username, please contact admin.`
-      //     )
-      //   );
+
       if (checkDuplicateOrNot) {
-        if (checkDuplicateOrNot.username == body.username) {
-          return done(
-            new AppError(`An account with that username already exists.`)
-          );
-        } else if (checkDuplicateOrNot.email == body.email) {
+        if (checkDuplicateOrNot.email == body.email) {
           return done(
             new AppError(`An account with that email already exists`)
           );
@@ -76,14 +63,14 @@ export const signupStrategy = new localStrategy(
       const emailVerificationCode = generateEmailVerificationCode();
       // create new user
       const user = await UserModel.create({
-        username,
+        email,
         password: passwordHash,
         email_verification_code: emailVerificationCode,
         pass_updated: 1,
         ...body,
       });
 
-      const profile = await ProfileModel.create();
+      const profile = await ProfileModel.create(body);
 
       await user.setProfile(profile);
 
@@ -104,22 +91,22 @@ export const signupStrategy = new localStrategy(
 
 export const loginStrategy = new localStrategy(
   {
-    usernameField: "username",
+    usernameField: "email",
     passwordField: "password",
   },
-  async (username, password, done) => {
+  async (email, password, done) => {
     try {
       let loginFailed = false;
       let user;
-      if (validator.isEmail(username)) {
-        // find user by username
-        user = <IUserModel>(
-          await UserModel.findOne({ where: { email: username } })
-        );
-      } else {
-        // find user by username
-        user = <IUserModel>await UserModel.findOne({ where: { username } });
-      }
+      // if (validator.isEmail(username)) {
+      //   // find user by username
+      //   user = <IUserModel>(
+      //     await UserModel.findOne({ where: { email: username } })
+      //   );
+      // } else {
+      // find user by username
+      user = <IUserModel>await UserModel.findOne({ where: { email } });
+      // }
       if (user) {
         let validate: boolean;
         const pass_updated = user.pass_updated;
@@ -130,7 +117,7 @@ export const loginStrategy = new localStrategy(
             const passwordHash = bcryptjs.hashSync(password, 10);
             await UserModel.update(
               { password: passwordHash, pass_updated: 1 },
-              { where: { username: user.username } }
+              { where: { email: user.email } }
             );
             validate = await bcryptjs.compare(password, passwordHash);
           }
@@ -146,7 +133,7 @@ export const loginStrategy = new localStrategy(
       }
       if (loginFailed) {
         return done(null, false, {
-          message: "Incorrect username/email or password.",
+          message: "Incorrect email or password.",
         });
       }
       // Send the user information to the next middleware
@@ -166,14 +153,14 @@ export const loginStrategy = new localStrategy(
 
 export const adminLoginStrategy = new localStrategy(
   {
-    usernameField: "username",
+    usernameField: "email",
     passwordField: "password",
   },
-  async (username, password, done) => {
+  async (email, password, done) => {
     try {
       let loginFailed = false;
       // find user by username
-      const user = <IUserModel>await UserModel.findOne({ where: { username } });
+      const user = <IUserModel>await UserModel.findOne({ where: { email } });
       if (user) {
         // check membership type is admin or not
         if (user.membership_type == "admin") {
@@ -186,7 +173,7 @@ export const adminLoginStrategy = new localStrategy(
               const passwordHash = bcryptjs.hashSync(password, 10);
               await UserModel.update(
                 { password: passwordHash, pass_updated: 1 },
-                { where: { username } }
+                { where: { email } }
               );
               validate = await bcryptjs.compare(password, passwordHash);
             }
@@ -206,7 +193,7 @@ export const adminLoginStrategy = new localStrategy(
       }
       if (loginFailed) {
         return done(null, false, {
-          message: "Incorrect username or password.",
+          message: "Incorrect email or password.",
         });
       }
       // Send the user information to the next middleware

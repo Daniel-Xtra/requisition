@@ -14,6 +14,8 @@ import { AdminRouter } from "./api/Admin/adminRouter";
 
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger/swagger.json";
+import { DivisionRouter } from "./api/Division/divisionRouter";
+import { RequestRouter } from "./api/Request/requestedRouter";
 
 class App {
   public express = express();
@@ -40,6 +42,8 @@ class App {
     this.express.use(`${this.basePath}/users`, UserRouter);
     this.express.use(`${this.basePath}/profiles`, ProfileRouter);
     this.express.use(`${this.basePath}/admin`, AdminRouter);
+    this.express.use(`${this.basePath}/divisions`, DivisionRouter);
+    this.express.use(`${this.basePath}/requests`, RequestRouter);
   }
 
   private registerMiddlewares() {

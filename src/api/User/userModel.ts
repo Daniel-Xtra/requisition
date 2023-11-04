@@ -1,25 +1,13 @@
 import Sequelize, { Model } from "sequelize";
 import { DB } from "../../shared/database";
 import { logger } from "../../utils/logger";
-import withCursor from "sequelize-cursor-pagination";
+
 import { ALTER_STATE } from "../../config";
+import { DivisionModel } from "../Division";
 
 export class UserModel extends Model {}
 UserModel.init(
   {
-    username: {
-      type: Sequelize.STRING(50),
-      unique: {
-        name: "username",
-        msg: "An account already exists with this username",
-      },
-      validate: {
-        is: /^[a-zA-Z0-9._-]{3,16}$/i,
-        notEmpty: {
-          msg: "Username cannot be empty",
-        },
-      },
-    },
     email: {
       type: Sequelize.STRING(50),
       unique: {
@@ -56,29 +44,12 @@ UserModel.init(
     },
     gender: {
       type: Sequelize.STRING(50),
-      // type: Sequelize.ENUM({
-      //   values: [
-      //     "male",
-      //     "female",
-      //   ],
-      // }),
-    },
-    date_of_birth: {
-      type: Sequelize.STRING(50),
     },
     membership_type: {
       type: Sequelize.ENUM({
-        values: [
-          "user",
-          "ambassador",
-          "shop-admin",
-          "admin",
-          "moderator",
-          "doctor",
-          "counsellor",
-        ],
+        values: ["staff", "store", "ict", "admin"],
       }),
-      defaultValue: "user",
+      defaultValue: "staff",
     },
     email_verification_code: {
       type: Sequelize.STRING(150),
@@ -106,10 +77,7 @@ UserModel.init(
       type: Sequelize.INTEGER,
       defaultValue: 0,
     },
-    user_status: {
-      type: Sequelize.BOOLEAN,
-      defaultValue: true,
-    },
+
     refresh_token: {
       type: Sequelize.STRING(150),
       unique: {
@@ -117,13 +85,6 @@ UserModel.init(
         msg: "Duplicate refresh token",
       },
       allowNull: true,
-    },
-    auth_key: {
-      type: Sequelize.TEXT,
-    },
-    username_updated: {
-      type: Sequelize.BOOLEAN,
-      defaultValue: false,
     },
   },
   {
@@ -134,13 +95,11 @@ UserModel.init(
 
 const options: any = { alter: ALTER_STATE };
 
-const paginationOptions: any = {
-  methodName: "paginate",
-  primaryKeyField: "id",
-};
+UserModel.belongsTo(DivisionModel);
+DivisionModel.hasMany(UserModel);
+
 // force: true will drop the table if it already exists
 UserModel.sync(options).then(() => {
   logger.info("Users table migrated");
   // Table created
 });
-withCursor(paginationOptions)(<any>UserModel);

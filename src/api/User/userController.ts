@@ -1,6 +1,5 @@
 import { BaseController } from "../baseController";
 import { UserService } from "./userService";
-import { IUser } from ".";
 
 /**
  * User controller
@@ -33,11 +32,11 @@ export class UserController extends BaseController {
    * @param data
    */
 
-  public updateUser = async (user: IUser, data: IUser) => {
-    // responsible for update user
-    const updated = await this._userService.updateUser(user, data);
-    return this.sendResponse(updated);
-  };
+  // public updateUser = async (user: IUser, data: IUser) => {
+  //   // responsible for update user
+  //   const updated = await this._userService.updateUser(user, data);
+  //   return this.sendResponse(updated);
+  // };
 
   public deleteAccount = async (username: string) => {
     const deleteUSer = await this._userService.deleteUserAccount(username);

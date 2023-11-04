@@ -19,7 +19,7 @@ export const adminAuthorize = (req, res, next) => {
       }
 
       const admin = await UserModel.findOne({
-        where: { username: token.username },
+        where: { email: token.email },
       });
 
       if (!admin) {

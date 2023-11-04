@@ -1,3 +1,6 @@
+import crypto from "crypto";
+import slugify from "slugify";
+
 export const getMomentTimeDiff = async (arr: any) => {
   let datenow = new Date().getTime();
   let expires = new Date(arr);
@@ -5,11 +8,6 @@ export const getMomentTimeDiff = async (arr: any) => {
   let duration = await Math.round(time_diff / (1000 * 3600 * 24));
   return duration;
 };
-
-/**
- * get moment time
- * @param arr
- */
 
 /**
  * user excludes
@@ -25,7 +23,7 @@ export const USER_EXCLUDES = [
   "email_verification_code",
   "reset_password_code",
   "refresh_token",
-  "auth_key",
+
   "updated_at",
   "deleted_at",
 ];
@@ -35,10 +33,6 @@ export const USER_EXCLUDES = [
  */
 
 export const PROFILE_EXCLUDES = [
-  "relationship_status",
-  "occupation",
-  "highest_education",
-  "current_education",
   "created_at",
   "updated_at",
   "deleted_at",
@@ -58,7 +52,7 @@ export const USER_EXCLUDES_FOR_APPENDDATA = [
   "date_of_birth",
   "email_verification_code",
   "socket_id",
-  "auth_key",
+
   "updated_at",
   "deleted_at",
   "userId",
@@ -74,3 +68,15 @@ export const USER_INCLUDES = [
   "gender",
   "date_of_birth",
 ];
+
+export const createSlug = (str: string) => {
+  let newString = slugify(str, {
+    remove: /[*+~.()'"!?:/@#${}<>,]/g,
+    lower: true,
+  });
+  // create random slug
+  const random = crypto.randomBytes(6).toString("hex");
+  newString = `${newString}-${random}`;
+
+  return newString;
+};

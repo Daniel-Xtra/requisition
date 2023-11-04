@@ -1,11 +1,8 @@
-import bcryptjs from "bcryptjs";
 import { UserModel } from "./userModel";
 import { AppError } from "../../utils/app-error";
 import { ProfileModel } from "../Profile";
 
 import { USER_EXCLUDES } from "../../utils/helpers";
-
-import { IUser } from ".";
 
 import { sendMailAfterDeleteAccount } from "../../utils/email";
 
@@ -17,10 +14,10 @@ export class UserService {
    * @memberof UserController
    */
 
-  public getUser = async (username: string) => {
+  public getUser = async (email: string) => {
     // find user from user model by username
     let user = await UserModel.findOne({
-      where: { username },
+      where: { email },
       attributes: {
         exclude: ["password", "email_verification_code", "auth_key"],
       },
@@ -41,7 +38,7 @@ export class UserService {
 
       return user;
     }
-    throw new AppError(`User '${username}' not found.`, null, 404);
+    throw new AppError(`User '${email}' not found.`, null, 404);
   };
 
   /**
@@ -53,40 +50,40 @@ export class UserService {
    * @memberof UserController
    */
 
-  public updateUser = async (user: IUser, data: IUser) => {
-    let username = user.username;
-    // let new_username = user.username;
-    if (data.username) {
-      // check if username updated
-      if (user.username_updated) {
-        throw new AppError("Cannot edit username");
-      }
-      if (data.username != username) {
-        // username = data.username;
-        data.username_updated = 1;
-      }
-    }
+  // public updateUser = async (user: IUser, data: IUser) => {
+  //   let username = user.username;
+  //   // let new_username = user.username;
+  //   if (data.username) {
+  //     // check if username updated
+  //     if (user.username_updated) {
+  //       throw new AppError("Cannot edit username");
+  //     }
+  //     if (data.username != username) {
+  //       // username = data.username;
+  //       data.username_updated = 1;
+  //     }
+  //   }
 
-    if (data.password) {
-      // bcrypt the password
-      data.password = bcryptjs.hashSync(data.password, 10);
-    }
-    if (data.username != username) {
-      // update user name
-      const updated = await UserModel.update(data, { where: { username } });
-      if (!updated) {
-        throw new AppError("Could not update user data");
-      }
-      username = data.username;
-      return await this.getUser(username);
-    }
-    // username = user.username;
-    const updated = await UserModel.update(data, { where: { username } });
-    if (!updated) {
-      throw new AppError("Could not update user data");
-    }
-    return await this.getUser(username);
-  };
+  //   if (data.password) {
+  //     // bcrypt the password
+  //     data.password = bcryptjs.hashSync(data.password, 10);
+  //   }
+  //   if (data.username != username) {
+  //     // update user name
+  //     const updated = await UserModel.update(data, { where: { username } });
+  //     if (!updated) {
+  //       throw new AppError("Could not update user data");
+  //     }
+  //     username = data.username;
+  //     return await this.getUser(username);
+  //   }
+  //   // username = user.username;
+  //   const updated = await UserModel.update(data, { where: { username } });
+  //   if (!updated) {
+  //     throw new AppError("Could not update user data");
+  //   }
+  //   return await this.getUser(username);
+  // };
 
   /**
    * Get user status
