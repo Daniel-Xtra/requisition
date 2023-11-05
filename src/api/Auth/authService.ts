@@ -149,7 +149,7 @@ export class AuthService {
     const body = { id: user.id, email: user.email };
     // generate jwt access token using jwt_secret
     const refreshToken = jwt.sign({ user: body }, JWT_SECRET_REFRESHTOKEN, {
-      expiresIn: "365d",
+      expiresIn: "11h",
     });
     return refreshToken;
   }
