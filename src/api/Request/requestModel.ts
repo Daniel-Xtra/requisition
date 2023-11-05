@@ -11,6 +11,11 @@ RequestModel.init(
     item: {
       type: Sequelize.STRING,
       allowNull: false,
+      validate: {
+        notNull: {
+          msg: "This is a required field",
+        },
+      },
     },
     unique_id: {
       type: Sequelize.STRING(100),
@@ -18,13 +23,21 @@ RequestModel.init(
         name: "unique_id",
         msg: "Duplicate unique_id",
       },
+      allowNull: false,
     },
     qty_required: {
       type: Sequelize.INTEGER,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: "This is a required field",
+        },
+      },
     },
 
     purpose: {
       type: Sequelize.STRING,
+      allowNull: true,
     },
     status: {
       type: Sequelize.STRING,
@@ -36,17 +49,25 @@ RequestModel.init(
     qty_approved: {
       type: Sequelize.INTEGER,
     },
+
     comment: {
       type: Sequelize.STRING,
+      allowNull: true,
     },
     approved_by: {
       type: Sequelize.INTEGER,
+    },
+    date_approved: {
+      type: Sequelize.DATE,
     },
     qty_issued: {
       type: Sequelize.INTEGER,
     },
     issued_by: {
       type: Sequelize.INTEGER,
+    },
+    date_issued: {
+      type: Sequelize.DATE,
     },
   },
   {

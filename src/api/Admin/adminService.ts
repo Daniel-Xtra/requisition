@@ -1,7 +1,7 @@
 import { UserModel } from "../User/userModel";
 import { Op } from "sequelize";
 
-import { PROFILE_EXCLUDES } from "../../utils/helpers";
+import { GENERAL_EXCLUDES } from "../../utils/helpers";
 import { ProfileModel } from "../Profile/profileModel";
 import { AppError } from "../../utils/app-error";
 
@@ -66,7 +66,7 @@ export class AdminService {
         {
           model: ProfileModel,
           attributes: {
-            exclude: PROFILE_EXCLUDES,
+            exclude: GENERAL_EXCLUDES,
           },
         },
       ],

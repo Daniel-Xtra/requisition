@@ -32,7 +32,7 @@ export const USER_EXCLUDES = [
  * profile excludes
  */
 
-export const PROFILE_EXCLUDES = [
+export const GENERAL_EXCLUDES = [
   "created_at",
   "updated_at",
   "deleted_at",
@@ -79,4 +79,23 @@ export const createSlug = (str: string) => {
   newString = `${newString}-${random}`;
 
   return newString;
+};
+
+export const generateUniqueIdentifier = () => {
+  return crypto.randomBytes(4).toString("hex");
+};
+
+export const getPagination = (page, per_page) => {
+  const limit = per_page ? +per_page : 3;
+  const offset = page ? (page - 1) * limit : 0;
+
+  return { limit, offset };
+};
+
+export const getPagingData = (data, page, limit) => {
+  const count = data.count;
+  const list = data.rows;
+  const currentPage = page ? +page : 1;
+  const totalPages = Math.ceil(count / limit);
+  return { count, list, totalPages, currentPage };
 };

@@ -1,5 +1,5 @@
-import { authorize } from "./authorization";
-import { adminAuthorize } from "./adminAuthorization";
+import { authorize, adminAuthorize, authorizeICT } from "./authorization";
+
 import errorHandler from "./errorHandler";
 import global from "./global";
 import { loginStrategy, signupStrategy, adminLoginStrategy } from "./passport";
@@ -14,4 +14,5 @@ export {
   signupStrategy,
   adminLoginStrategy,
   adminAuthorize,
+  authorizeICT,
 };
