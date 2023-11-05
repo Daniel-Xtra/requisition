@@ -18,10 +18,12 @@
       "name": "Admin"
     },
     { "name": "Auth" },
+    { "name": "Ict" },
     {
       "name": "Divisions"
     },
-    { "name": "Requests" }
+    { "name": "Requests" },
+    { "name": "Stores" }
   ],
   "paths": {
     "/auth/signup": {
@@ -595,6 +597,89 @@
             }
           }
         },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/ict/all": {
+      "get": {
+        "tags": ["Ict"],
+        "summary": "Get Request By Ict",
+        "description": "Get Request By Ict , Might provide page_no, per_page, from, to, sort_by which could be either ict_pending, store_pending, issued",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguage"
+          },
+          {
+            "$ref": "#/components/parameters/SortBy"
+          },
+          {
+            "$ref": "#/components/parameters/PageNo"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/successResponseObject"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/badRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/forbiddenResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serverErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "userAccessToken": []
+          }
+        ],
         "x-codegen-request-body-name": "body"
       }
     },
@@ -1312,6 +1397,89 @@
         "tags": ["Requests"],
         "summary": "Get Request By User",
         "description": "Get Request By User , Might provide page_no, per_page, from, to, sort_by which could be either ict_pending, store_pending, issued",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguage"
+          },
+          {
+            "$ref": "#/components/parameters/SortBy"
+          },
+          {
+            "$ref": "#/components/parameters/PageNo"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/successResponseObject"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/badRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/forbiddenResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serverErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "userAccessToken": []
+          }
+        ],
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/stores/all": {
+      "get": {
+        "tags": ["Stores"],
+        "summary": "Get Request By Store",
+        "description": "Get Request By Store , Might provide page_no, per_page, from, to, sort_by which could be either  store_pending, issued",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguage"

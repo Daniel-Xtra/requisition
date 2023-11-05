@@ -132,7 +132,7 @@ export class AuthService {
   public async generateToken(user: IUser) {
     const body = { id: user.id, email: user.email };
     // generate jwt access token using jwt_secret
-    const token = jwt.sign({ user: body }, JWT_SECRET, { expiresIn: "180d" });
+    const token = jwt.sign({ user: body }, JWT_SECRET, { expiresIn: "11h" });
     return token;
   }
 
