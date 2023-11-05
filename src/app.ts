@@ -16,6 +16,8 @@ import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger/swagger.json";
 import { DivisionRouter } from "./api/Division/divisionRouter";
 import { RequestRouter } from "./api/Request/requestedRouter";
+import { StoreRouter } from "./api/Store/storeRouter";
+import { IctRouter } from "./api/ICT/ictRouter";
 
 class App {
   public express = express();
@@ -44,6 +46,8 @@ class App {
     this.express.use(`${this.basePath}/admin`, AdminRouter);
     this.express.use(`${this.basePath}/divisions`, DivisionRouter);
     this.express.use(`${this.basePath}/requests`, RequestRouter);
+    this.express.use(`${this.basePath}/stores`, StoreRouter);
+    this.express.use(`${this.basePath}/ict`, IctRouter);
   }
 
   private registerMiddlewares() {

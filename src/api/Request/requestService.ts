@@ -115,6 +115,12 @@ export class RequestService {
 
   /**
    * individualRequest
+   * @param {Object} user
+   * @param {String} sort_by
+   * @param {Number} page_no
+   * @param {Number} per_page
+   * @param {String} from
+   * @param {String} to
    */
   public individualRequest = async (
     user: IUser,

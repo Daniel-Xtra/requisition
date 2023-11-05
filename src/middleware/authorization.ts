@@ -51,7 +51,7 @@ export const authorizeICT = (req, res, next) => {
         return next(new AppError("Unauthorized", null, 401));
       }
 
-      if (ict.membership_type !== "admin") {
+      if (ict.membership_type !== "ict") {
         return next(
           new AppError("You are not a valid ICT personnel", null, 400)
         );
