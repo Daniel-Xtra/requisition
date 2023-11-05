@@ -1,28 +1,30 @@
 import express from "express";
 import { controllerHandler } from "../../shared/controllerHandler";
 import { RequestController } from "./requestController";
-import { authorize, authorizeICT, validation } from "../../middleware";
+import { authorizeICT, validation } from "../../middleware";
 import {
   IctValidationSchema,
   RequestValidationSchema,
   StoreValidationSchema,
 } from "./requestValidation";
-import { authorizeStore } from "../../middleware/authorization";
+import { authorize, authorizeStore } from "../../middleware/authorization";
 
 const call = controllerHandler;
 const Request = new RequestController();
 
 const router = express.Router();
 
-router.use(authorize);
+// router.use(authorize);
 
 router.get(
   "/:unique_id",
+  authorize,
   call(Request.fetchRequest, (req, res, next) => [req.params.unique_id])
 );
 
 router.post(
   "/",
+  authorize,
   validation(RequestValidationSchema),
   call(Request.makeRequest, (req, res, next) => [req.user, req.body])
 );
@@ -51,6 +53,7 @@ router.put(
 
 router.get(
   "/individual/request",
+  authorize,
   call(Request.individualRequest, (req, res, next) => [req.user, req.query])
 );
 
