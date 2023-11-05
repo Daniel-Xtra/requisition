@@ -9,11 +9,11 @@ const ICT = new IctController();
 
 const router = express.Router();
 
-// router.use(authorizeICT);
+router.use(authorizeICT);
 
 router.get(
   "/all",
-  authorizeICT,
+
   call(ICT.allRequest, (req, res, next) => [req.query])
 );
 
