@@ -16,10 +16,10 @@ router.get(
   call(User.index, (req, res, next) => [])
 );
 
-router.put(
-  "/",
-  call(User.updateUser, (req, res, next) => [req.user, req.body])
-);
+// router.put(
+//   "/",
+//   call(User.updateUser, (req, res, next) => [req.user, req.body])
+// );
 
 router.get(
   "/:username",
