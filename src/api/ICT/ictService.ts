@@ -12,12 +12,13 @@ import { UserModel } from "../User";
 
 export class IctService {
   /**
-   * allRequest
-   * @param {String} sort_by
-   * @param {Number} page_no
-   * @param {Number} per_page
-   * @param {String} from
-   * @param {String} to
+   * Fetches requests approved by ICT`s
+   * @param {String} sort_by condition to be used in sorting the response
+   * @param {Number} page_no page no to pull form response
+   * @param {Number} per_page length of data per response
+   * @param {String} from date to start fron
+   * @param {String} to date to end with
+   * @returns {Object[]} array of requests approved
    */
   public allRequest = async (
     sort_by = "all",

@@ -16,8 +16,9 @@ import moment from "moment";
 
 export class RequestService {
   /**
-   * fetchRequest
+   * Fetches single request using its unique id
    * @param {String} unique_id
+   * @returns {Object} fetched request
    */
   public fetchRequest = async (unique_id: string) => {
     const fetch = await RequestModel.findOne({
@@ -40,7 +41,7 @@ export class RequestService {
   };
 
   /**
-   * makeRequest
+   * Making a request by any staff
    * @param {Object} user
    * @param {Object} data
    * @returns {Object} on success
@@ -62,7 +63,7 @@ export class RequestService {
   };
 
   /**
-   * reviewICT
+   * Approval by ICT personnel
    * @param {Object} user
    * @param {String} unique_id
    * @param {Object} data
@@ -88,7 +89,7 @@ export class RequestService {
   };
 
   /**
-   * reviewStore
+   * Approval by Store manager
    * @param {Object} user
    * @param {String} unique_id
    * @param {Object} data
@@ -114,7 +115,7 @@ export class RequestService {
   };
 
   /**
-   * individualRequest
+   * Fetches request made by single user
    * @param {Object} user
    * @param {String} sort_by
    * @param {Number} page_no
