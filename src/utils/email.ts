@@ -17,7 +17,7 @@ const sendMailGmail = async (body: string, to: string[], subject?: string) => {
   let mailOptions = {
     from: '"shippers" <noreply@shippers.com>',
     to: recipients,
-    subject: subject ? subject : "New mail from myPaddi",
+    subject: subject ? subject : "New mail from shipper`s council",
     generateTextFromHTML: true,
     html: body,
   };
@@ -28,7 +28,7 @@ const sendMailGmail = async (body: string, to: string[], subject?: string) => {
   return info;
 };
 export const sendPasswordReset = async (code: string, user: any) => {
-  const message = `<h3>Hi ${user.username},</h3>
+  const message = `<h3>Hi ${user.email},</h3>
         <p>Here's the password reset code you requested: <strong>${code}</strong></p>
         <p>If you believe you did this in error, please ignore this email.</p>`;
   let sentMail = await sendMailGmail(
@@ -43,7 +43,7 @@ export const sendPasswordReset = async (code: string, user: any) => {
 };
 
 export const sendMailAfterRegister = async (user: any) => {
-  const message = `<h3>Hi ${user.username},</h3>
+  const message = `<h3>Hi ${user.email},</h3>
         <p>You have registered <strong>successfully</strong></p>
         <p>If you believe you did this in error, please ignore this email.</p>`;
   let sentMail = await sendMailGmail(
@@ -58,7 +58,7 @@ export const sendMailAfterRegister = async (user: any) => {
 };
 
 export const sendMailAfterDeleteAccount = async (user: any) => {
-  const message = `<h3>Hi ${user.username},</h3>
+  const message = `<h3>Hi ${user.email},</h3>
         <p>Your account has been deleted <strong>successfully</strong></p>
         <p>If you believe you did this in error, please ignore this email.</p>`;
   let sentMail = await sendMailGmail(message, [user.email], "Account Deleted");

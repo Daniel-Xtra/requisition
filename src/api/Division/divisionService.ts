@@ -10,7 +10,7 @@ export class DivisionService {
    * createDivision
 
    * @param {Object} data
-   * @returns newDivision
+   * @returns {Object} return the just created division
    * @memberof divisionController
    */
   public createDivision = async (data: IDivision) => {
@@ -37,8 +37,8 @@ export class DivisionService {
    * updateDivision
 
    * @param {String} slug
-   * @param {Object} data
-   * @returns updatedDivision
+   * @param {Object} data 
+   * @returns {Object} return the updated division
    * @memberof divisionController
    */
 
@@ -71,7 +71,7 @@ export class DivisionService {
   /**
    * deleteDivision
 
-   * @param {String} slug
+   * @param {String} slug 
    * @returns {String} on success
    * @memberof divisionController
    */
@@ -113,7 +113,7 @@ export class DivisionService {
 
   /**
    * getDivisions
-   * @return all
+   * @return {Object[]} array containing divisions
    */
   public getDivisions = async () => {
     const all = await DivisionModel.findAll();
@@ -123,6 +123,7 @@ export class DivisionService {
   /**
    * getDivision
    * @param {String} slug
+   * @returns {Object} single division
    */
   public getDivision = async (slug: string) => {
     const single = await DivisionModel.findOne({ where: { slug } });
