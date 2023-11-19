@@ -33,7 +33,7 @@ export class IctService {
 
     if (sort_by == "all") {
       condition.status = {
-        [Op.or]: ["ict_pending", "store_pending", "issued"],
+        [Op.or]: ["ict_pending"],
       };
     } else {
       if (sort_by) {
@@ -90,8 +90,34 @@ export class IctService {
         { model: DivisionModel, attributes: { exclude: GENERAL_EXCLUDES } },
       ],
     };
-    const requests = await RequestModel.findAndCountAll(findObject);
+    let requests = await RequestModel.findAndCountAll(findObject);
+    let count = requests.count;
+    requests = await Promise.all(
+      requests.rows.map(async (e) => {
+        e = e.toJSON();
 
-    return getPagingData(requests, page_no, limit);
+        let approved_by = await UserModel.findOne({
+          where: { id: e.approved_by },
+
+          attributes: { exclude: USER_EXCLUDES },
+        });
+
+        let issued_by = await UserModel.findOne({
+          where: { id: e.issued_by },
+
+          attributes: { exclude: USER_EXCLUDES },
+        });
+        e.approved_name = approved_by;
+        e.issuer_name = issued_by;
+
+        return e;
+      })
+    );
+
+    let data = await {
+      count: count,
+      rows: requests,
+    };
+    return getPagingData(data, page_no, limit);
   };
 }

@@ -17,8 +17,7 @@ export const USER_EXCLUDES = [
   "email",
   "phone_number",
   "password",
-  "first_name",
-  "last_name",
+
   "date_of_birth",
   "email_verification_code",
   "reset_password_code",

@@ -47,19 +47,26 @@ export class RequestService {
    * @returns {Object} on success
    */
   public makeRequest = async (user: any, data: IRequests) => {
-    let bulkData = [];
+    let bulkData: any = [];
+
+    const de = await DivisionModel.findOne({ where: { slug: data.division } });
+    // console.log(de);
+    if (!de) throw new AppError("Division not found");
+
     data.requests.forEach(async (element) => {
       element.unique_id = generateUniqueIdentifier();
       element.status = "ict_pending";
+      element.divisionId = de.id;
 
       bulkData.push(element);
     });
 
+    if (bulkData.length <= 0)
+      throw new AppError("Could not create request", null, 400);
+
     const fresh = await RequestModel.bulkCreate(bulkData);
 
     if (fresh && user.addRequest(fresh)) return fresh;
-
-    throw new AppError("Could not create request", null, 400);
   };
 
   /**
@@ -207,8 +214,34 @@ export class RequestService {
       ],
     };
 
-    let data = await RequestModel.findAndCountAll(findObject);
+    let requests = await RequestModel.findAndCountAll(findObject);
+    let count = requests.count;
+    requests = await Promise.all(
+      requests.rows.map(async (e) => {
+        e = e.toJSON();
 
+        let approved_by = await UserModel.findOne({
+          where: { id: e.approved_by },
+
+          attributes: { exclude: USER_EXCLUDES },
+        });
+
+        let issued_by = await UserModel.findOne({
+          where: { id: e.issued_by },
+
+          attributes: { exclude: USER_EXCLUDES },
+        });
+        e.approved_name = approved_by;
+        e.issuer_name = issued_by;
+
+        return e;
+      })
+    );
+
+    let data = await {
+      count: count,
+      rows: requests,
+    };
     return getPagingData(data, page_no, limit);
   };
 }

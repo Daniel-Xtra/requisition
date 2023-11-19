@@ -83,13 +83,41 @@ export class StoreService {
         {
           model: UserModel,
           required: true,
+
           attributes: { exclude: USER_EXCLUDES },
         },
         { model: DivisionModel, attributes: { exclude: GENERAL_EXCLUDES } },
       ],
     };
-    const requests = await RequestModel.findAndCountAll(findObject);
 
-    return getPagingData(requests, page_no, limit);
+    let requests = await RequestModel.findAndCountAll(findObject);
+    let count = requests.count;
+    requests = await Promise.all(
+      requests.rows.map(async (e) => {
+        e = e.toJSON();
+
+        let approved_by = await UserModel.findOne({
+          where: { id: e.approved_by },
+
+          attributes: { exclude: USER_EXCLUDES },
+        });
+
+        let issued_by = await UserModel.findOne({
+          where: { id: e.issued_by },
+
+          attributes: { exclude: USER_EXCLUDES },
+        });
+        e.approved_name = approved_by;
+        e.issuer_name = issued_by;
+
+        return e;
+      })
+    );
+
+    let data = await {
+      count: count,
+      rows: requests,
+    };
+    return getPagingData(data, page_no, limit);
   };
 }

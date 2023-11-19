@@ -8,21 +8,24 @@ const call = controllerHandler;
 const Division = new DivisionController();
 const router = express.Router();
 
-router.use(adminAuthorize);
+// router.use(adminAuthorize);
 router.use(validation(DivisionValidationSchema));
 
 router.post(
   "/",
+  adminAuthorize,
   call(Division.createDivision, (req, res, next) => [req.body])
 );
 
 router.put(
   "/:slug",
+  adminAuthorize,
   call(Division.updateDivision, (req, res, next) => [req.params.slug, req.body])
 );
 
 router.delete(
   "/:slug",
+  adminAuthorize,
   call(Division.delete, (req, res, next) => [req.params.slug])
 );
 

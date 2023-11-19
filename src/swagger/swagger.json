@@ -1061,7 +1061,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "required": ["item", "qty_required"],
+                "required": ["item", "qty_required", "division"],
                 "type": "object",
                 "properties": {
                   "requests": {
@@ -1074,12 +1074,15 @@
                         },
                         "qty_required": {
                           "type": "string"
-                        },
-                        "purpose": {
-                          "type": "string"
                         }
                       }
                     }
+                  },
+                  "division": {
+                    "type": "string"
+                  },
+                  "purpose": {
+                    "type": "string"
                   }
                 }
               }
