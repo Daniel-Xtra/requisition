@@ -44,6 +44,7 @@ UserModel.init(
     },
     gender: {
       type: Sequelize.STRING(50),
+      allowNull: true,
     },
     membership_type: {
       type: Sequelize.ENUM({
@@ -67,7 +68,7 @@ UserModel.init(
     },
     verified: {
       type: Sequelize.BOOLEAN,
-      defaultValue: true,
+      defaultValue: false,
     },
 
     player_id: {

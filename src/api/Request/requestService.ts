@@ -12,16 +12,20 @@ import { DivisionModel } from "../Division";
 import { IUser, UserModel } from "../User";
 import { IRequest, IRequests } from "./IRequest";
 import { RequestModel } from "./requestModel";
+
 import moment from "moment";
+import { IctService } from "../ICT/ictService";
 
 export class RequestService {
+  private _ictService = new IctService();
+
   /**
    * Fetches single request using its unique id
    * @param {String} unique_id
    * @returns {Object} fetched request
    */
   public fetchRequest = async (unique_id: string) => {
-    const fetch = await RequestModel.findOne({
+    let fetch = await RequestModel.findOne({
       where: { unique_id },
       include: [
         {
@@ -36,7 +40,25 @@ export class RequestService {
         },
       ],
     });
-    if (fetch) return fetch;
+
+    if (fetch) {
+      let all = fetch.toJSON();
+      let approved_by = await UserModel.findOne({
+        where: { id: all.approved_by },
+
+        attributes: { exclude: USER_EXCLUDES },
+      });
+
+      let issued_by = await UserModel.findOne({
+        where: { id: all.issued_by },
+
+        attributes: { exclude: USER_EXCLUDES },
+      });
+      all.approved_name = approved_by;
+      all.issuer_name = issued_by;
+
+      return all;
+    }
     throw new AppError(`Request ${unique_id} not found`, null, 400);
   };
 
@@ -50,7 +72,7 @@ export class RequestService {
     let bulkData: any = [];
 
     const de = await DivisionModel.findOne({ where: { slug: data.division } });
-    // console.log(de);
+
     if (!de) throw new AppError("Division not found");
 
     data.requests.forEach(async (element) => {
@@ -66,7 +88,32 @@ export class RequestService {
 
     const fresh = await RequestModel.bulkCreate(bulkData);
 
-    if (fresh && user.addRequest(fresh)) return fresh;
+    if (!fresh) throw new AppError("bulk not saved");
+    await user.addRequest(fresh);
+    const ids = await fresh.map((data) => data.id);
+
+    const newRefresh = await this.justCreated(ids);
+
+    return newRefresh;
+  };
+
+  public justCreated = async (ids: number[]) => {
+    let merger = await RequestModel.findAll({
+      where: { id: { [Op.in]: ids } },
+      include: [
+        {
+          model: UserModel,
+          required: true,
+          attributes: { exclude: USER_EXCLUDES },
+        },
+        {
+          model: DivisionModel,
+          required: true,
+        },
+      ],
+    });
+    if (!merger) return [];
+    return merger;
   };
 
   /**
@@ -78,7 +125,6 @@ export class RequestService {
   public reviewICT = async (user: any, unique_id: string, data: IRequest) => {
     const check = await this.fetchRequest(unique_id);
     if (check) {
-      console.log(check.status);
       if (check.status == "ict_pending") {
         data.approved_by = user.id;
         data.date_approved = new Date(Date.now());
@@ -86,7 +132,7 @@ export class RequestService {
         const review = await RequestModel.update(data, {
           where: { unique_id },
         });
-        if (review) return this.fetchRequest(check.unique_id);
+        if (review) return this._ictService.allRequest();
         throw new AppError("Could not update request", null, 400);
       }
       throw new AppError("Request already approved", null, 400);
@@ -104,7 +150,6 @@ export class RequestService {
   public reviewStore = async (user: any, unique_id: string, data: IRequest) => {
     const check = await this.fetchRequest(unique_id);
     if (check) {
-      console.log(check.status);
       if (check.status == "store_pending") {
         data.issued_by = user.id;
         data.date_issued = new Date(Date.now());
@@ -134,7 +179,7 @@ export class RequestService {
     user: IUser,
     sort_by: "all",
     page_no = 0,
-    per_page = 3,
+    per_page = 15,
     from?: any,
     to?: any
   ) => {

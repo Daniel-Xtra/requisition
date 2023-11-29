@@ -3,8 +3,13 @@ import { BaseController } from "../baseController";
 import { AppError } from "./../../utils/app-error";
 import { IUser, UserService } from "./../User";
 import crypto from "crypto";
-import { sendMailAfterRegister, sendPasswordReset } from "../../utils/email";
+import {
+  sendEmailVerification,
+  sendMailAfterRegister,
+  sendPasswordReset,
+} from "../../utils/email";
 import { AuthService } from "./authService";
+import { AddMinutesToDate, generateOTP } from "../../utils/helpers";
 
 /* Auth Controller
  *
@@ -99,25 +104,12 @@ export class AuthController extends BaseController {
    */
 
   public signup = async (user: IUser) => {
-    //check for code for the new app
-    // if (!user.code) {
-    //   throw new AppError("Please update your app.");
-    // }
-    // responsible for generating access token
-    const accessToken = await this._authService.generateToken(user);
-    // responsible for getting user details
     const newUser = await this._userService.getUser(user.email);
-    // responsible for generating refresh token
-    const refreshToken = await this._authService.generateRefreshToken(user);
-    // responsible for send mail after registered successfully
     let sent = sendMailAfterRegister(user);
     if (!sent) {
       throw new AppError("An error occurred");
     }
-    return this.sendResponse(
-      { user: newUser, token: accessToken, refreshToken },
-      "User registration successful"
-    );
+    return this.emailVerification(newUser.email);
   };
 
   /**
@@ -188,11 +180,7 @@ export class AuthController extends BaseController {
    * @param email
    */
 
-  public requestPasswordReset = async (email: string, body: any) => {
-    // if (!body.code) {
-    //   throw new AppError("Please update your app..");
-    // }
-    // responsible for get user details by email
+  public requestPasswordReset = async (email: string) => {
     const user = await this._authService.getUserDetailsByEmail(email);
     // responsible for generate password reset code
     const password_reset_code = this.generatePasswordResetCode();
@@ -215,6 +203,29 @@ export class AuthController extends BaseController {
     }
   };
 
+  public emailVerification = async (email) => {
+    const user = await this._authService.getUserDetailsByEmail(email);
+    const email_verification_code = generateOTP();
+    const now = new Date();
+    const expiration_time = AddMinutesToDate(now, 3);
+    const otp = await this._authService.emailVerification(
+      email_verification_code,
+      expiration_time,
+      user
+    );
+    if (otp) {
+      let sent = sendEmailVerification(email_verification_code, user);
+      if (!sent) {
+        throw new AppError("An error occurred");
+      }
+      return this.sendResponse({
+        status: true,
+        message: `email verification code has been sent to ${email}.`,
+        statusCode: 200,
+      });
+    }
+  };
+
   /**
    * This function is used for verify reset code
    * @param code
@@ -226,6 +237,12 @@ export class AuthController extends BaseController {
     if (isValid) {
       return this.sendResponse("Password reset code is valid");
     }
+  };
+
+  public verifyEmail = async (code: string) => {
+    // responsible for verify the reset code
+    const isValid = await this._authService.verifyEmailOTP(code);
+    return this.sendResponse(isValid);
   };
 
   /**

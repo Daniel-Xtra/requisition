@@ -65,6 +65,7 @@ export const signupStrategy = new localStrategy(
       const user = await UserModel.create({
         email,
         password: passwordHash,
+        membership_type: "staff",
         email_verification_code: emailVerificationCode,
         pass_updated: 1,
         ...body,
@@ -97,36 +98,35 @@ export const loginStrategy = new localStrategy(
   async (email, password, done) => {
     try {
       let loginFailed = false;
+      let verifiedFailed = false;
       let user;
-      // if (validator.isEmail(username)) {
-      //   // find user by username
-      //   user = <IUserModel>(
-      //     await UserModel.findOne({ where: { email: username } })
-      //   );
-      // } else {
-      // find user by username
+
       user = <IUserModel>await UserModel.findOne({ where: { email } });
       // }
       if (user) {
-        let validate: boolean;
-        const pass_updated = user.pass_updated;
-        if (pass_updated == 0) {
-          if (generateSha1Hash(password) != user.password) {
-            validate = false;
+        if (user.verified == true) {
+          let validate: boolean;
+          const pass_updated = user.pass_updated;
+          if (pass_updated == 0) {
+            if (generateSha1Hash(password) != user.password) {
+              validate = false;
+            } else {
+              const passwordHash = bcryptjs.hashSync(password, 10);
+              await UserModel.update(
+                { password: passwordHash, pass_updated: 1 },
+                { where: { email: user.email } }
+              );
+              validate = await bcryptjs.compare(password, passwordHash);
+            }
           } else {
-            const passwordHash = bcryptjs.hashSync(password, 10);
-            await UserModel.update(
-              { password: passwordHash, pass_updated: 1 },
-              { where: { email: user.email } }
-            );
-            validate = await bcryptjs.compare(password, passwordHash);
+            validate = await bcryptjs.compare(password, user.password);
+          }
+
+          if (!validate) {
+            loginFailed = true;
           }
         } else {
-          validate = await bcryptjs.compare(password, user.password);
-        }
-
-        if (!validate) {
-          loginFailed = true;
+          verifiedFailed = true;
         }
       } else {
         loginFailed = true;
@@ -134,6 +134,11 @@ export const loginStrategy = new localStrategy(
       if (loginFailed) {
         return done(null, false, {
           message: "Incorrect email or password.",
+        });
+      }
+      if (verifiedFailed) {
+        return done(null, false, {
+          message: "Account not verified",
         });
       }
       // Send the user information to the next middleware

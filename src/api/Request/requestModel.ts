@@ -40,7 +40,9 @@ RequestModel.init(
       allowNull: true,
     },
     status: {
-      type: Sequelize.STRING,
+      type: Sequelize.ENUM({
+        values: ["ict_pending", "store_pending", "cancelled", "issued"],
+      }),
     },
     requested_by: {
       type: Sequelize.INTEGER,

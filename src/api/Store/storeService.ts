@@ -23,7 +23,7 @@ export class StoreService {
   public allRequest = async (
     sort_by = "all",
     page_no = 0,
-    per_page = 3,
+    per_page = 15,
     from?: any,
     to?: any
   ) => {

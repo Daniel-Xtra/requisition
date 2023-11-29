@@ -67,3 +67,18 @@ export const sendMailAfterDeleteAccount = async (user: any) => {
   }
   throw new AppError("Could not send mail");
 };
+
+export const sendEmailVerification = async (code: number, user: any) => {
+  const message = `<h3>Hi ${user.email},</h3>
+        <p>Here's your email verification code <strong>${code}</strong></p>
+        <p>If you believe you did this in error, please ignore this email.</p>`;
+  let sentMail = await sendMailGmail(
+    message,
+    [user.email],
+    "Email Verification Code"
+  );
+  if (sentMail) {
+    return "success";
+  }
+  throw new AppError("Could not send email verification code");
+};
