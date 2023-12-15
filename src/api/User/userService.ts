@@ -4,8 +4,6 @@ import { ProfileModel } from "../Profile";
 
 import { USER_EXCLUDES } from "../../utils/helpers";
 
-import { sendMailAfterDeleteAccount } from "../../utils/email";
-
 export class UserService {
   /**
    * Function responsible for get user
@@ -34,56 +32,10 @@ export class UserService {
 
     // check if user exists then the next operation can perform,or not
     if (user) {
-      // user = user.toJSON();
-
       return user;
     }
     throw new AppError(`User '${email}' not found.`, null, 404);
   };
-
-  /**
-   * Updates a user resource
-   * @public
-   * @param {Object} user the current user
-   * @param {Object} data the data to be updated
-   * @returns {(Object|null)} the updated user resource
-   * @memberof UserController
-   */
-
-  // public updateUser = async (user: IUser, data: IUser) => {
-  //   let username = user.username;
-  //   // let new_username = user.username;
-  //   if (data.username) {
-  //     // check if username updated
-  //     if (user.username_updated) {
-  //       throw new AppError("Cannot edit username");
-  //     }
-  //     if (data.username != username) {
-  //       // username = data.username;
-  //       data.username_updated = 1;
-  //     }
-  //   }
-
-  //   if (data.password) {
-  //     // bcrypt the password
-  //     data.password = bcryptjs.hashSync(data.password, 10);
-  //   }
-  //   if (data.username != username) {
-  //     // update user name
-  //     const updated = await UserModel.update(data, { where: { username } });
-  //     if (!updated) {
-  //       throw new AppError("Could not update user data");
-  //     }
-  //     username = data.username;
-  //     return await this.getUser(username);
-  //   }
-  //   // username = user.username;
-  //   const updated = await UserModel.update(data, { where: { username } });
-  //   if (!updated) {
-  //     throw new AppError("Could not update user data");
-  //   }
-  //   return await this.getUser(username);
-  // };
 
   /**
    * Get user status
@@ -131,7 +83,7 @@ export class UserService {
           where: { username },
         });
         if (destroyed) return "User Account deleted";
-        await sendMailAfterDeleteAccount(userDetails);
+        // await sendMailAfterDeleteAccount(userDetails);
         throw new AppError("Could not delete user account", null, 400);
       }
       throw new AppError(

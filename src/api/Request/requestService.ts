@@ -183,69 +183,9 @@ export class RequestService {
     from?: any,
     to?: any
   ) => {
-    let condition: any = {};
-
     const { limit, offset } = getPagination(page_no, per_page);
 
-    if (sort_by == "all") {
-      condition.requested_by = user.id;
-    } else {
-      condition = {
-        [Op.and]: [
-          { requested_by: user.id },
-          { status: { [Op.like]: `%${sort_by}%` } },
-        ],
-      };
-      // if (sort_by == "ict_pending") {
-      //   condition = {
-      //     [Op.and]: [{ requested_by: user.id }, { status: "ict_pending" }],
-      //   };
-      // }
-      // if (sort_by == "store_pending") {
-      //   condition = {
-      //     [Op.and]: [{ requested_by: user.id }, { status: "store_pending" }],
-      //   };
-      // }
-      // if (sort_by == "issued") {
-      //   condition = {
-      //     [Op.and]: [{ requested_by: user.id }, { status: "issued" }],
-      //   };
-      // }
-      if (from && to) {
-        const start = new Date(
-          new Date(moment(from).format()).setHours(0, 0, 0)
-        );
-        const end = new Date(
-          new Date(moment(to).format()).setHours(23, 59, 59)
-        );
-
-        condition = {
-          [Op.and]: [
-            { updated_at: { [Op.gt]: start, [Op.lt]: end } },
-
-            { requested_by: user.id },
-          ],
-        };
-      }
-      if (from && to && sort_by) {
-        const start = new Date(
-          new Date(moment(from).format()).setHours(0, 0, 0)
-        );
-        const end = new Date(
-          new Date(moment(to).format()).setHours(23, 59, 59)
-        );
-
-        condition = {
-          [Op.and]: [
-            { updated_at: { [Op.gt]: start, [Op.lt]: end } },
-            { status: { [Op.like]: `%${sort_by}%` } },
-            { requested_by: user.id },
-          ],
-        };
-      }
-    }
     let findObject: any = {
-      where: condition,
       order: [["updated_at", "desc"]],
       limit,
       offset,
@@ -258,6 +198,77 @@ export class RequestService {
         { model: DivisionModel, attributes: { exclude: GENERAL_EXCLUDES } },
       ],
     };
+
+    if (sort_by == "all") {
+      if (sort_by == "all") {
+        findObject.where = {
+          [Op.and]: [
+            {
+              status: {
+                [Op.or]: [
+                  "store_pending",
+                  "issued",
+                  "ict_pending",
+                  "cancelled",
+                ],
+              },
+            },
+            { requested_by: user.id },
+          ],
+        };
+      }
+      if (sort_by == "all" && from && to) {
+        const start = new Date(
+          new Date(moment(from).format()).setHours(0, 0, 0)
+        );
+        const end = new Date(
+          new Date(moment(to).format()).setHours(23, 59, 59)
+        );
+
+        findObject.where = {
+          [Op.and]: [
+            { updated_at: { [Op.gt]: start, [Op.lt]: end } },
+            {
+              status: {
+                [Op.or]: [
+                  "store_pending",
+                  "issued",
+                  "ict_pending",
+                  "cancelled",
+                ],
+              },
+            },
+            { requested_by: user.id },
+          ],
+        };
+      }
+    } else {
+      if (sort_by) {
+        findObject.where = {
+          [Op.and]: [
+            { status: { [Op.like]: `${sort_by}` } },
+            { requested_by: user.id },
+          ],
+        };
+      }
+
+      if (sort_by && from && to) {
+        const start = new Date(
+          new Date(moment(from).format()).setHours(0, 0, 0)
+        );
+        const end = new Date(
+          new Date(moment(to).format()).setHours(23, 59, 59)
+        );
+
+        findObject.where = {
+          [Op.and]: [
+            { updated_at: { [Op.gt]: start, [Op.lt]: end } },
+            { status: { [Op.like]: `${sort_by}` } },
+            { requested_by: user.id },
+          ],
+        };
+      }
+    }
 
     let requests = await RequestModel.findAndCountAll(findObject);
     let count = requests.count;

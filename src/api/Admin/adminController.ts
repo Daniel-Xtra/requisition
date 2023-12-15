@@ -1,6 +1,5 @@
 import { BaseController } from "../baseController";
 import { AdminService } from "./adminService";
-import { IUser } from "../User";
 
 /* Admin Controller
  *
@@ -17,18 +16,11 @@ export class AdminController extends BaseController {
    * @param user
    */
 
-  public getAllUsers = async (
-    user: IUser,
-    per_page: number,
-    post_next: string,
-    post_prev: string
-  ) => {
+  public getAllUsers = async (req: any) => {
     // responsible for get all users
     const all_users = await this._adminService.getAllUsers(
-      user,
-      per_page,
-      post_next,
-      post_prev
+      req.page_no,
+      req.per_page
     );
     return this.sendResponse(all_users);
   };
@@ -39,9 +31,20 @@ export class AdminController extends BaseController {
    * @param data
    */
 
-  public updateUser = async (username: string, data: any) => {
+  public updateUser = async (email: string, data: any) => {
     // responsible for update user
-    const updated = await this._adminService.updateUser(username, data);
+    const updated = await this._adminService.updateUser(email, data);
     return this.sendResponse(updated);
+  };
+
+  public allRequest = async (req: any) => {
+    const requests = await this._adminService.allRequest(
+      req.sort_by,
+      req.page_no,
+      req.per_page,
+      req.from,
+      req.to
+    );
+    return this.sendResponse(requests);
   };
 }
