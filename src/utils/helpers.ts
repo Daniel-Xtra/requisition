@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import slugify from "slugify";
+import * as generate from "otp-generator";
 
 export const getMomentTimeDiff = async (arr: any) => {
   let datenow = new Date().getTime();
@@ -17,8 +18,7 @@ export const USER_EXCLUDES = [
   "email",
   "phone_number",
   "password",
-  "first_name",
-  "last_name",
+
   "date_of_birth",
   "email_verification_code",
   "reset_password_code",
@@ -98,4 +98,17 @@ export const getPagingData = (data, page, limit) => {
   const currentPage = page ? +page : 1;
   const totalPages = Math.ceil(count / limit);
   return { count, list, totalPages, currentPage };
+};
+
+export const generateOTP = () => {
+  const otp = generate.generate(6, {
+    lowerCaseAlphabets: false,
+    upperCaseAlphabets: false,
+    specialChars: false,
+  });
+  return otp;
+};
+
+export const AddMinutesToDate = (date, minutes) => {
+  return new Date(date.getTime() + minutes * 60000);
 };

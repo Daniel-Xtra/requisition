@@ -34,6 +34,7 @@
     "node-fetch": "^2.6.1",
     "node-mysql-deadlock-retries": "^2.0.5",
     "nodemailer": "^6.6.3",
+    "otp-generator": "^4.0.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",

@@ -4,6 +4,8 @@ import { IUser, UserModel } from "./../User";
 import { AppError } from "./../../utils/app-error";
 import { IUserModel } from "../../interfaces";
 import bcryptjs from "bcryptjs";
+import { OTPModel } from "./otpModel";
+import moment from "moment";
 
 export class AuthService {
   /**
@@ -200,6 +202,17 @@ export class AuthService {
     return updated;
   }
 
+  public async emailVerification(otp: number, expiration_time: any, user: any) {
+    const otp_instance = await OTPModel.create({
+      otp: otp,
+      expiration_time: expiration_time,
+      userId: user.id,
+    });
+    if (!otp_instance) throw new AppError("Could not create otp");
+
+    return otp_instance;
+  }
+
   /**
    * Request for verify reset code
    *
@@ -218,6 +231,35 @@ export class AuthService {
       throw new AppError("Invalid password reset code");
     }
     return user;
+  }
+
+  public async verifyEmailOTP(code: string) {
+    // find user from user model by password_reset_code
+    const exist = await OTPModel.findOne({
+      where: { otp: code },
+    });
+    if (exist) {
+      if (exist.verified !== true) {
+        if (moment().isBefore(exist.expiration_time)) {
+          const verify = await OTPModel.update(
+            { verified: true },
+            { where: { id: exist.id } }
+          );
+          if (verify) {
+            const update = await UserModel.update(
+              { verified: true },
+              { where: { id: exist.userId } }
+            );
+            if (!update) throw new AppError("could not verify user email");
+            return "email verified";
+          }
+          throw new AppError("could not update otp status");
+        }
+        throw new AppError("OTP Expired");
+      }
+      throw new AppError("OTP already used");
+    }
+    throw new AppError("Invalid otp");
   }
 
   /**

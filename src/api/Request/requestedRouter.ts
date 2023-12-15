@@ -17,7 +17,7 @@ const router = express.Router();
 // router.use(authorize);
 
 router.get(
-  "/:unique_id",
+  "/request/:unique_id",
   authorize,
   call(Request.fetchRequest, (req, res, next) => [req.params.unique_id])
 );

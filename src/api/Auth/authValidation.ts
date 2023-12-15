@@ -10,11 +10,11 @@ export const SignupValidationSchema = Joi.object().keys({
   password: Joi.string().min(6).max(32).required(),
   email: Joi.string().email().required(),
   phone_number: Joi.number().required(),
-  gender: Joi.string().required(),
+  gender: Joi.string().allow("").optional(),
   first_name: Joi.string().alphanum().max(30).allow("").optional(),
   last_name: Joi.string().alphanum().max(30).allow("").optional(),
-  current_position: Joi.string(),
-  membership_type: Joi.string(),
+  current_position: Joi.string().allow("").optional(),
+  membership_type: Joi.string().optional(),
   code: Joi.string(),
 });
 

@@ -13,6 +13,7 @@ export const RequestValidationSchema = Joi.object().keys({
   requests: Joi.array().items({
     item: Joi.string().required(),
     qty_required: Joi.string().required(),
-    purpose: Joi.string().allow(""),
   }),
+  division: Joi.string().required(),
+  purpose: Joi.string().allow("", null),
 });

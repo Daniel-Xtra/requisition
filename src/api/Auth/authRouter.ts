@@ -29,49 +29,62 @@ router.post(
     validation(SignupValidationSchema),
     passport.authenticate("signup", { session: false }),
   ],
-  call(Auth.signup, (req, res, next) => [req.user]),
+  call(Auth.signup, (req, res, next) => [req.user])
 );
 
 router.post(
   "/signin",
   [validation(LoginValidationSchema)],
-  call(Auth.login, (req, res, next) => [req, res, next]),
+  call(Auth.login, (req, res, next) => [req, res, next])
 );
 
 router.post(
   "/admin-signin",
   [validation(LoginValidationSchema)],
-  call(Auth.adminLogin, (req, res, next) => [req, res, next]),
+  call(Auth.adminLogin, (req, res, next) => [req, res, next])
 );
 
 router.post(
   "/logout",
   authorize,
-  call(Auth.logout, (req, _res, _next) => [req.user]),
+  call(Auth.logout, (req, _res, _next) => [req.user])
 );
 
 router.post(
   "/request-reset/:email",
-  call(Auth.requestPasswordReset, (req, _res, _next) => [req.params.email, req.body]),
+  call(Auth.requestPasswordReset, (req, _res, _next) => [
+    req.params.email,
+    req.body,
+  ])
+);
+
+router.post(
+  "/request-email-verify/:email",
+  call(Auth.emailVerification, (req, _res, _next) => [req.params.email])
 );
 
 router.get(
   "/verify-code",
-  call(Auth.verifyResetCode, (req, _res, _next) => [req.query.c]),
+  call(Auth.verifyResetCode, (req, _res, _next) => [req.query.c])
+);
+
+router.get(
+  "/verify-email",
+  call(Auth.verifyEmail, (req, _res, _next) => [req.query.c])
 );
 
 router.get(
   "/validate-username/:username",
-  call(Auth.validateUsername, (req, _res, _next) => [req.params.username]),
+  call(Auth.validateUsername, (req, _res, _next) => [req.params.username])
 );
 
 router.get(
   "/validate-email/:email",
-  call(Auth.validateEmail, (req, _res, _next) => [req.params.email]),
+  call(Auth.validateEmail, (req, _res, _next) => [req.params.email])
 );
 router.get(
   "/validate-phone/:phone",
-  call(Auth.validatePhone, (req, _res, _next) => [req.params.phone]),
+  call(Auth.validatePhone, (req, _res, _next) => [req.params.phone])
 );
 
 router.post(
@@ -79,13 +92,13 @@ router.post(
   call(Auth.resetPassword, (req, _res, _next) => [
     req.body.code,
     req.body.password,
-  ]),
+  ])
 );
 
 router.post(
   "/refresh-token",
   validation(RefreshTokensValidationSchema),
-  call(Auth.refreshTokens, (req, res, next) => [req.body.refreshToken]),
+  call(Auth.refreshTokens, (req, res, next) => [req.body.refreshToken])
 );
 
 router.post(
@@ -94,7 +107,7 @@ router.post(
   call(Auth.refreshTokensById, (req, res, next) => [
     req.params.id,
     req.body.refreshToken,
-  ]),
+  ])
 );
 
 router.get("/", (rq, rs) => rs.send("good"));
