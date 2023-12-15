@@ -1,15 +1,17 @@
 import { UserModel } from "../User/userModel";
-import { Op } from "sequelize";
-
-import { GENERAL_EXCLUDES } from "../../utils/helpers";
+import {
+  GENERAL_EXCLUDES,
+  USER_EXCLUDES,
+  getPagination,
+  getPagingData,
+} from "../../utils/helpers";
 import { ProfileModel } from "../Profile/profileModel";
 import { AppError } from "../../utils/app-error";
 
-import bcryptjs from "bcryptjs";
-
-// import crypto from "crypto";
-// import slugify from "slugify";
-import { IUser } from "../User";
+import { DivisionModel } from "../Division";
+import moment from "moment";
+import { Op } from "sequelize";
+import { RequestModel } from "../Request";
 
 export class AdminService {
   /**
@@ -27,41 +29,17 @@ export class AdminService {
    * @memberof AdminController
    */
 
-  public getAllUsers = async (
-    user: IUser,
-    per_page: number = 15,
-    post_next: string,
-    post_prev: string
-  ) => {
-    const limit: number = Number(per_page);
-    // responsible for paginate users with given limit
-    let users = await (<any>UserModel).paginate({
+  public getAllUsers = async (page_no = 0, per_page = 15) => {
+    const { limit, offset } = getPagination(page_no, per_page);
+
+    let findObject: any = {
+      order: [["updated_at", "desc"]],
       limit,
-      desc: true,
-      before: post_prev,
-      after: post_next,
-      attributes: [
-        "id",
-        "username",
-        "email",
-        "phone_number",
-        "first_name",
-        "last_name",
-        "gender",
-        "date_of_birth",
-        "membership_type",
-        "verified",
-        "socket_id",
-        "player_id",
-        "pass_updated",
-        "created_at",
-        "updated_at",
-      ],
-      where: {
-        membership_type: {
-          [Op.ne]: "admin",
-        },
+      offset,
+      attributes: {
+        exclude: USER_EXCLUDES,
       },
+
       include: [
         {
           model: ProfileModel,
@@ -69,19 +47,14 @@ export class AdminService {
             exclude: GENERAL_EXCLUDES,
           },
         },
+        {
+          model: DivisionModel,
+        },
       ],
-    });
+    };
 
-    if (users) {
-      // responsible for count total users
-      const totalUsers = await UserModel.count();
-      return {
-        users: users.results,
-        cursors: users.cursors,
-        totalUsers,
-      };
-    }
-    throw new AppError("No users found", null, 404);
+    let users = await UserModel.findAndCountAll(findObject);
+    return getPagingData(users, page_no, limit);
   };
 
   /**
@@ -93,21 +66,17 @@ export class AdminService {
    * @memberof AdminController
    */
 
-  public updateUser = async (username: string, data: any) => {
-    if (data.username) {
-      throw new AppError("Cannot edit username");
-    }
-
-    if (data.password) {
-      data.password = bcryptjs.hashSync(data.password, 10);
-    }
-
+  public updateUser = async (email: string, data: any) => {
     // update user data by username
-    const updated = await UserModel.update(data, { where: { username } });
-    if (!updated) {
-      throw new AppError("Could not update user data");
+    const fetch = await this.getUser(email);
+    if (fetch) {
+      const updated = await UserModel.update(data, { where: { email } });
+      if (!updated) {
+        throw new AppError("Could not update user data");
+      }
+      return await this.getUser(email);
     }
-    return await this.getUser(username);
+    return fetch;
   };
 
   /**
@@ -117,19 +86,22 @@ export class AdminService {
    * @memberof AdminController
    */
 
-  public getUser = async (username: string) => {
+  public getUser = async (email: string) => {
     // find user from user model by username
     let user = await UserModel.findOne({
-      where: { username },
+      where: { email },
       attributes: {
-        exclude: ["password", "email_verification_code", "auth_key"],
+        exclude: USER_EXCLUDES,
       },
       include: [
         {
           model: ProfileModel,
           attributes: {
-            exclude: ["updated_at", "deleted_at", "userId"],
+            exclude: GENERAL_EXCLUDES,
           },
+        },
+        {
+          model: DivisionModel,
         },
       ],
     });
@@ -137,36 +109,115 @@ export class AdminService {
     if (user) {
       return user;
     }
-    throw new AppError(`User '${username}' not found.`, null, 404);
+    throw new AppError(`User '${email}' not found.`, null, 404);
   };
 
-  /**
-   * Signup details
-   * @param {Any} TODAY_START
-   * @param {Any} NOW
-   * @param {Any} WEEK_AGO
-   * @param {Any} MONTH_AGO
-   * @param {Any} YEAR_AGO
-   * @returns user_counts on success
-   * @memberof AdminController
-   */
+  public allRequest = async (
+    sort_by = "all",
+    page_no = 0,
+    per_page = 15,
+    from?: any,
+    to?: any
+  ) => {
+    const { limit, offset } = getPagination(page_no, per_page);
 
-  /**
-   * Create a new slug (unique url string) for the post
-   * @param {string} str the post title
-   * @return {string} the new slug string
-   * @memberof AdminController
-   */
+    let findObject: any = {
+      order: [["updated_at", "desc"]],
+      limit,
+      offset,
+      include: [
+        {
+          model: UserModel,
+          required: true,
 
-  // private createSlug = (str: string) => {
-  //   let newString = slugify(str, {
-  //     remove: /[*+~.()'"!?:/@#${}<>,]/g,
-  //     lower: true,
-  //   });
-  //   // create random slug
-  //   const random = crypto.randomBytes(6).toString("hex");
-  //   newString = `${newString}-${random}`;
+          attributes: { exclude: USER_EXCLUDES },
+        },
+        { model: DivisionModel, attributes: { exclude: GENERAL_EXCLUDES } },
+      ],
+    };
 
-  //   return newString;
-  // };
+    if (sort_by == "all") {
+      if (sort_by == "all") {
+        findObject.where = {
+          status: {
+            [Op.or]: ["store_pending", "issued", "ict_pending", "cancelled"],
+          },
+        };
+      }
+      if (sort_by == "all" && from && to) {
+        const start = new Date(
+          new Date(moment(from).format()).setHours(0, 0, 0)
+        );
+        const end = new Date(
+          new Date(moment(to).format()).setHours(23, 59, 59)
+        );
+
+        findObject.where = {
+          [Op.and]: [
+            { updated_at: { [Op.gt]: start, [Op.lt]: end } },
+            {
+              status: {
+                [Op.or]: [
+                  "store_pending",
+                  "issued",
+                  "ict_pending",
+                  "cancelled",
+                ],
+              },
+            },
+          ],
+        };
+      }
+    } else {
+      if (sort_by) {
+        findObject.where = { status: { [Op.like]: `${sort_by}` } };
+      }
+
+      if (sort_by && from && to) {
+        const start = new Date(
+          new Date(moment(from).format()).setHours(0, 0, 0)
+        );
+        const end = new Date(
+          new Date(moment(to).format()).setHours(23, 59, 59)
+        );
+
+        findObject.where = {
+          [Op.and]: [
+            { updated_at: { [Op.gt]: start, [Op.lt]: end } },
+            { status: { [Op.like]: `${sort_by}` } },
+          ],
+        };
+      }
+    }
+
+    let requests = await RequestModel.findAndCountAll(findObject);
+    let count = requests.count;
+    requests = await Promise.all(
+      requests.rows.map(async (e) => {
+        e = e.toJSON();
+
+        let approved_by = await UserModel.findOne({
+          where: { id: e.approved_by },
+
+          attributes: { exclude: USER_EXCLUDES },
+        });
+
+        let issued_by = await UserModel.findOne({
+          where: { id: e.issued_by },
+
+          attributes: { exclude: USER_EXCLUDES },
+        });
+        e.approved_name = approved_by;
+        e.issuer_name = issued_by;
+
+        return e;
+      })
+    );
+
+    let data = await {
+      count: count,
+      rows: requests,
+    };
+    return getPagingData(data, page_no, limit);
+  };
 }

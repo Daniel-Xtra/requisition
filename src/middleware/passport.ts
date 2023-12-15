@@ -1,5 +1,5 @@
 import bcryptjs from "bcryptjs";
-import crypto from "crypto";
+// import crypto from "crypto";
 import generateSha1Hash from "sha1";
 import _ from "lodash";
 import { ExtractJwt, Strategy as JWTstrategy } from "passport-jwt";
@@ -60,13 +60,13 @@ export const signupStrategy = new localStrategy(
       }
 
       const passwordHash = bcryptjs.hashSync(password, 10);
-      const emailVerificationCode = generateEmailVerificationCode();
+
       // create new user
       const user = await UserModel.create({
         email,
         password: passwordHash,
         membership_type: "staff",
-        email_verification_code: emailVerificationCode,
+
         pass_updated: 1,
         ...body,
       });
@@ -235,8 +235,8 @@ export const jwtStrategy = new JWTstrategy(
  * @returns {string} hexadecimal string
  */
 
-function generateEmailVerificationCode() {
-  // generate email verification code
-  const str = crypto.randomBytes(20).toString("hex");
-  return str;
-}
+// function generateEmailVerificationCode() {
+//   // generate email verification code
+//   const str = crypto.randomBytes(20).toString("hex");
+//   return str;
+// }

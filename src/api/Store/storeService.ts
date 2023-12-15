@@ -27,55 +27,9 @@ export class StoreService {
     from?: any,
     to?: any
   ) => {
-    let condition: any = {};
-
     const { limit, offset } = getPagination(page_no, per_page);
 
-    if (sort_by == "all") {
-      condition.status = { [Op.or]: ["store_pending", "issued"] };
-    } else {
-      if (sort_by) {
-        condition = {
-          [Op.and]: [{ status: { [Op.like]: `%${sort_by}%` } }],
-        };
-      }
-      if (from && to) {
-        const start = new Date(
-          new Date(moment(from).format()).setHours(0, 0, 0)
-        );
-        const end = new Date(
-          new Date(moment(to).format()).setHours(23, 59, 59)
-        );
-
-        condition = {
-          [Op.and]: [
-            { updated_at: { [Op.gt]: start, [Op.lt]: end } },
-            { status: { [Op.or]: ["store_pending", "issued"] } },
-          ],
-        };
-
-        // condition = {updated_at:{ [Op.gt]: start, [Op.lt]: end }};
-      }
-
-      if (from && to && sort_by) {
-        const start = new Date(
-          new Date(moment(from).format()).setHours(0, 0, 0)
-        );
-        const end = new Date(
-          new Date(moment(to).format()).setHours(23, 59, 59)
-        );
-
-        condition = {
-          [Op.and]: [
-            { updated_at: { [Op.gt]: start, [Op.lt]: end } },
-            { status: { [Op.like]: `%${sort_by}%` } },
-          ],
-        };
-      }
-    }
-
     let findObject: any = {
-      where: condition,
       order: [["updated_at", "desc"]],
       limit,
       offset,
@@ -89,6 +43,55 @@ export class StoreService {
         { model: DivisionModel, attributes: { exclude: GENERAL_EXCLUDES } },
       ],
     };
+
+    if (sort_by == "all") {
+      if (sort_by == "all") {
+        findObject.where = {
+          status: {
+            [Op.or]: ["store_pending", "issued"],
+          },
+        };
+      }
+      if (sort_by == "all" && from && to) {
+        const start = new Date(
+          new Date(moment(from).format()).setHours(0, 0, 0)
+        );
+        const end = new Date(
+          new Date(moment(to).format()).setHours(23, 59, 59)
+        );
+
+        findObject.where = {
+          [Op.and]: [
+            { updated_at: { [Op.gt]: start, [Op.lt]: end } },
+            {
+              status: {
+                [Op.or]: ["store_pending", "issued"],
+              },
+            },
+          ],
+        };
+      }
+    } else {
+      if (sort_by) {
+        findObject.where = { status: { [Op.like]: `${sort_by}` } };
+      }
+
+      if (sort_by && from && to) {
+        const start = new Date(
+          new Date(moment(from).format()).setHours(0, 0, 0)
+        );
+        const end = new Date(
+          new Date(moment(to).format()).setHours(23, 59, 59)
+        );
+
+        findObject.where = {
+          [Op.and]: [
+            { updated_at: { [Op.gt]: start, [Op.lt]: end } },
+            { status: { [Op.like]: `${sort_by}` } },
+          ],
+        };
+      }
+    }
 
     let requests = await RequestModel.findAndCountAll(findObject);
     let count = requests.count;

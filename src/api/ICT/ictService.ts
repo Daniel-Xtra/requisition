@@ -27,18 +27,27 @@ export class IctService {
     from?: any,
     to?: any
   ) => {
-    let condition: any = {};
-
     const { limit, offset } = getPagination(page_no, per_page);
+    let findObject: any = {
+      order: [["updated_at", "desc"]],
+      limit,
+      offset,
+      include: [
+        {
+          model: UserModel,
+          required: true,
+          attributes: { exclude: USER_EXCLUDES },
+        },
+        { model: DivisionModel, attributes: { exclude: GENERAL_EXCLUDES } },
+      ],
+    };
 
     if (sort_by == "all") {
-      condition.status = {
-        [Op.or]: ["ict_pending"],
-      };
+      findObject.where = { status: "ict_pending" };
     } else {
       if (sort_by) {
-        condition = {
-          [Op.and]: [{ status: { [Op.like]: `%${sort_by}%` } }],
+        findObject.where = {
+          [Op.and]: [{ status: { [Op.like]: `${sort_by}` } }],
         };
       }
       if (from && to) {
@@ -49,7 +58,7 @@ export class IctService {
           new Date(moment(to).format()).setHours(23, 59, 59)
         );
 
-        condition = {
+        findObject.where = {
           [Op.and]: [
             { updated_at: { [Op.gt]: start, [Op.lt]: end } },
             { status: { [Op.or]: ["ict_pending", "store_pending", "issued"] } },
@@ -67,7 +76,7 @@ export class IctService {
           new Date(moment(to).format()).setHours(23, 59, 59)
         );
 
-        condition = {
+        findObject.where = {
           [Op.and]: [
             { updated_at: { [Op.gt]: start, [Op.lt]: end } },
             { status: { [Op.like]: `%${sort_by}%` } },
@@ -76,20 +85,6 @@ export class IctService {
       }
     }
 
-    let findObject: any = {
-      where: condition,
-      order: [["updated_at", "desc"]],
-      limit,
-      offset,
-      include: [
-        {
-          model: UserModel,
-          required: true,
-          attributes: { exclude: USER_EXCLUDES },
-        },
-        { model: DivisionModel, attributes: { exclude: GENERAL_EXCLUDES } },
-      ],
-    };
     let requests = await RequestModel.findAndCountAll(findObject);
     let count = requests.count;
     requests = await Promise.all(

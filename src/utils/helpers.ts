@@ -15,15 +15,12 @@ export const getMomentTimeDiff = async (arr: any) => {
  */
 
 export const USER_EXCLUDES = [
-  "email",
   "phone_number",
   "password",
-
   "date_of_birth",
   "email_verification_code",
   "reset_password_code",
   "refresh_token",
-
   "updated_at",
   "deleted_at",
 ];

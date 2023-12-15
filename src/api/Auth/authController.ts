@@ -5,7 +5,7 @@ import { IUser, UserService } from "./../User";
 import crypto from "crypto";
 import {
   sendEmailVerification,
-  sendMailAfterRegister,
+  // sendMailAfterRegister,
   sendPasswordReset,
 } from "../../utils/email";
 import { AuthService } from "./authService";
@@ -105,10 +105,10 @@ export class AuthController extends BaseController {
 
   public signup = async (user: IUser) => {
     const newUser = await this._userService.getUser(user.email);
-    let sent = sendMailAfterRegister(user);
-    if (!sent) {
-      throw new AppError("An error occurred");
-    }
+    // let sent = sendMailAfterRegister(user);
+    // if (!sent) {
+    //   throw new AppError("An error occurred");
+    // }
     return this.emailVerification(newUser.email);
   };
 
