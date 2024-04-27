@@ -10,6 +10,9 @@
     "watch": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "engines": {
+    "node": "20.9.0"
+  },
   "author": "Daniel Akanbi, Nnamdi",
   "contributors": [
     "Brian Iyoha"
