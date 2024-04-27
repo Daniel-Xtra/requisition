@@ -1,1 +1,1 @@
-web:  --port=$PORT
+web: tsc && node ./dist --port=$PORT
