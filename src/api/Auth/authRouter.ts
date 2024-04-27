@@ -52,10 +52,7 @@ router.post(
 
 router.post(
   "/request-reset/:email",
-  call(Auth.requestPasswordReset, (req, _res, _next) => [
-    req.params.email,
-    req.body,
-  ])
+  call(Auth.requestPasswordReset, (req, _res, _next) => [req.params.email])
 );
 
 router.post(

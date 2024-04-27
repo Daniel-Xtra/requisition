@@ -29,7 +29,7 @@ export class AdminService {
    * @memberof AdminController
    */
 
-  public getAllUsers = async (page_no = 0, per_page = 15) => {
+  public getAllUsers = async (sort_by = "all", page_no = 0, per_page = 15) => {
     const { limit, offset } = getPagination(page_no, per_page);
 
     let findObject: any = {
@@ -53,8 +53,18 @@ export class AdminService {
       ],
     };
 
-    let users = await UserModel.findAndCountAll(findObject);
-    return getPagingData(users, page_no, limit);
+    if (sort_by == "true") {
+      findObject.where = { verified: 1 };
+      let users = await UserModel.findAndCountAll(findObject);
+      return getPagingData(users, page_no, limit);
+    } else if (sort_by == "false") {
+      findObject.where = { verified: 0 };
+      let users = await UserModel.findAndCountAll(findObject);
+      return getPagingData(users, page_no, limit);
+    } else {
+      let users = await UserModel.findAndCountAll(findObject);
+      return getPagingData(users, page_no, limit);
+    }
   };
 
   /**
@@ -70,11 +80,21 @@ export class AdminService {
     // update user data by username
     const fetch = await this.getUser(email);
     if (fetch) {
-      const updated = await UserModel.update(data, { where: { email } });
-      if (!updated) {
-        throw new AppError("Could not update user data");
+      if (data.division) {
+        const confirm = await DivisionModel.findOne({
+          where: { name: data.division },
+        });
+        if (!confirm) {
+          throw new AppError("Division not found");
+        }
+        data.divisionId = confirm.id;
+
+        const updated = await UserModel.update(data, { where: { email } });
+        if (!updated) {
+          throw new AppError("Could not update user data");
+        }
+        return await this.getUser(email);
       }
-      return await this.getUser(email);
     }
     return fetch;
   };
@@ -219,5 +239,35 @@ export class AdminService {
       rows: requests,
     };
     return getPagingData(data, page_no, limit);
+  };
+
+  public memberAnalytics = async () => {
+    let active = await UserModel.findAndCountAll({
+      where: { verified: true },
+    });
+    let inactive = await UserModel.findAndCountAll({
+      where: { verified: false },
+    });
+    return {
+      active: active.count,
+      inactive: inactive.count,
+    };
+  };
+
+  public analysis = async () => {
+    const ict = await RequestModel.findAndCountAll({
+      where: { status: "ict_pending" },
+    });
+    const store = await RequestModel.findAndCountAll({
+      where: { status: "store_pending" },
+    });
+    const issued = await RequestModel.findAndCountAll({
+      where: { status: "issued" },
+    });
+    return {
+      ict_pending: ict.count,
+      store_pending: store.count,
+      issued: issued.count,
+    };
   };
 }

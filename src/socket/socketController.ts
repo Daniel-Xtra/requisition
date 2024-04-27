@@ -11,7 +11,10 @@ export class SocketController {
   constructor(app) {
     this.server = app;
     this.io = new Server(this.server, {
-      cors: { origin: ["https://admin.socket.io"], credentials: true },
+      cors: {
+        origin: ["http://localhost:4200", "https://admin.socket.io"],
+        credentials: true,
+      },
     });
   }
 
@@ -37,7 +40,7 @@ export class SocketController {
           this.emit(socket, events.MESSAGE, `You joined ${room}`);
           socket.broadcast
             .to(room)
-            .emit(events.MESSAGE, { text: `${roo.email} has joined!` });
+            .emit(events.ROOM_MESSAGE, `${roo.email} has joined!`);
         }
       });
 
@@ -53,13 +56,59 @@ export class SocketController {
         }
       });
 
+      socket.on(events.STORE_REVIEW, async (unique_Id: string) => {
+        const res = await this._socketService.storeReview(socket.id, unique_Id);
+        if (res != undefined) {
+          if (res.to_sockets && res.to_sockets.length > 0) {
+            res.to_sockets.forEach((element) => {
+              element = element.toJSON();
+              this.emit(
+                socket,
+                events.STORE_REVIEW,
+                res.message,
+                element.socket_id
+              );
+              socket.broadcast
+                .to("store")
+                .emit(events.STORE_MESSAGE, res.message, res.count);
+            });
+          }
+        }
+      });
+
+      socket.on(events.ICT_REVIEW, async (unique_Id: string) => {
+        const res = await this._socketService.ictReview(socket.id, unique_Id);
+        if (res != undefined) {
+          if (res.to_sockets && res.to_sockets.length > 0) {
+            res.to_sockets.forEach((element) => {
+              element = element.toJSON();
+              this.emit(
+                socket,
+                events.ICT_REVIEW,
+                res.message,
+                element.socket_id
+              );
+              socket.broadcast
+                .to("ict")
+                .emit(events.ICT_MESSAGE, res.ictMesage);
+              socket.broadcast
+                .to("store")
+                .emit(events.ICT_STORE, res.storeMessage);
+            });
+          }
+        }
+      });
+
       socket.on("disconnect", async (reason: string) => {
         const res = await this._socketService.disconnect(reason, socket.id);
 
         if (res) {
           const status = await this._socketService.getUserStatus(res);
           if (status) {
-            socket.broadcast.emit(events.ONLINE_STATUS, status);
+            socket.broadcast.emit(
+              events.ONLINE_STATUS,
+              `${socket.id} is ${status}`
+            );
           }
         }
       });
