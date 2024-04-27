@@ -1,1 +1,1 @@
-web: tsc && node ./dist
+web: npm start --port=$PORT
