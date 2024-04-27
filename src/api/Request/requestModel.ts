@@ -81,9 +81,9 @@ RequestModel.init(
 DivisionModel.hasMany(RequestModel);
 RequestModel.belongsTo(DivisionModel);
 
-UserModel.hasMany(RequestModel, { foreignKey: "requested_by" });
+UserModel.hasMany(RequestModel);
 
-RequestModel.belongsTo(UserModel, { foreignKey: "requested_by" });
+RequestModel.belongsTo(UserModel);
 
 const options: any = {
   alter: ALTER_STATE,
