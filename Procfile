@@ -1,1 +1,1 @@
-web: tsc && node ./dist --port=$PORT
+web: node ./dist/index.js --port=$PORT
