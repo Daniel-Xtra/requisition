@@ -84,5 +84,6 @@ export class ProfileService {
       }
       throw new AppError("Could not update profile picture");
     }
+    // eed
   };
 }
