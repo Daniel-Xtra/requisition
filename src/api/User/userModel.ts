@@ -2,7 +2,7 @@ import Sequelize, { Model } from "sequelize";
 import { DB } from "../../shared/database";
 import { logger } from "../../utils/logger";
 
-import { ALTER_STATE } from "../../config";
+//import { ALTER_STATE } from "../../config";
 // import { DivisionModel } from "../Division";
 
 export class UserModel extends Model {}
@@ -94,13 +94,13 @@ UserModel.init(
   }
 );
 
-const options: any = { alter: ALTER_STATE };
+//const options: any = { alter: ALTER_STATE };
 
 // UserModel.hasOne(DivisionModel);
 // DivisionModel.hasMany(UserModel);
 
 // force: true will drop the table if it already exists
-UserModel.sync(options).then(() => {
+UserModel.sync().then(() => {
   logger.info("Users table migrated");
   // Table created
 });
