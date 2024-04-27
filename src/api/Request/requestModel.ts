@@ -3,7 +3,7 @@ import { DB } from "../../shared/database";
 import { logger } from "../../utils/logger";
 import { ALTER_STATE } from "../../config";
 import { UserModel } from "../User/userModel";
-import { DivisionModel } from "../Division";
+// import { DivisionModel } from "../Division";
 
 export class RequestModel extends Model {}
 RequestModel.init(
@@ -78,12 +78,12 @@ RequestModel.init(
   }
 );
 
-DivisionModel.hasMany(RequestModel);
-RequestModel.belongsTo(DivisionModel);
+// DivisionModel.hasMany(RequestModel);
+// RequestModel.belongsTo(DivisionModel);
 
-UserModel.hasMany(RequestModel);
+// UserModel.hasMany(RequestModel, { foreignKey: "requested_by" });
 
-RequestModel.belongsTo(UserModel);
+// RequestModel.belongsTo(UserModel, { foreignKey: "requested_by" });
 
 const options: any = {
   alter: ALTER_STATE,
