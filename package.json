@@ -4,7 +4,8 @@
   "description": "requistion's api built on TypeScript",
   "main": "./dist/index.js",
   "scripts": {
-    "post-install": "mkdir ./logs",
+    "tsc": "./node_modules/typescript/bin/tsc",
+    "post-install": "mkdir ./logs && npm run tsc",
     "compile": "tsc",
     "start": "tsc && node ./dist",
     "watch": "nodemon",
@@ -51,6 +52,7 @@
     "socket.io": "^4.7.2",
     "swagger-ui-express": "^4.1.5",
     "tslib": "^1.9.3",
+    "typescript": "^4.9.5",
     "uuid": "^3.3.2",
     "validator": "^13.6.0",
     "voucher-code-generator": "^1.1.1",
@@ -69,6 +71,6 @@
     "@types/node": "^10.17.5",
     "nodemon": "^3.0.1",
     "tslint": "^5.11.0",
-    "typescript": "^4.4.3"
+    "typescript": "^4.9.5"
   }
 }
