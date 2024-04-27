@@ -1,24 +1,24 @@
 import { AppError } from "./../../utils/app-error";
 import { ProfileModel, IProfile } from ".";
 import { UserModel } from "../User";
-
+const { cloudinary } = require("../../middleware/cloudinary");
 export class ProfileService {
-  public getUserProfile = async (username: string) => {
+  public getUserProfile = async (email: string) => {
     // find user from user model by username
-    const user = await UserModel.findOne({ where: { username } });
+    const user = await UserModel.findOne({ where: { email } });
     if (user) {
       // get user profile excluding id and user_id
       const profile = await ProfileModel.findOne({
         where: { user_id: user.id },
         attributes: {
-          exclude: ["id", "user_id"],
+          exclude: ["id", "userId", "created_at", "deleted_at", "updated_at"],
         },
         raw: true,
       });
 
       return profile ? profile : null;
     }
-    return `User with ${username} not found`;
+    return `User with ${email} not found`;
   };
 
   /**
@@ -39,14 +39,14 @@ export class ProfileService {
       });
       if (updated) {
         // return user profile
-        return await this.getUserProfile(user.username);
+        return await this.getUserProfile(user.email);
       }
       throw new AppError("Could not update user profile");
     } else {
       // create profile in profile model
       const saved = await ProfileModel.create(profile);
       if (saved && user.setProfile(saved)) {
-        return await this.getUserProfile(user.username);
+        return await this.getUserProfile(user.email);
       }
       throw new AppError("Could not create user profile");
     }
@@ -62,9 +62,20 @@ export class ProfileService {
    */
 
   public saveProfilePhoto = async (user: any, photo: any) => {
-    const profileData = {
-      profile_picture_url: photo.location,
+    const result = await cloudinary.uploader
+      .upload(photo.path, { folder: "Profile" }, function (result) {
+        return result;
+      })
+      .catch((error) => {
+        throw new AppError(
+          `Error while uploading picture ${photo.originalname}`
+        );
+      });
+
+    const profileData = await {
+      profile_picture_url: result.secure_url,
     };
+
     const hasProfile: boolean = (await user.getProfile()) ? true : false;
 
     if (hasProfile) {
@@ -73,17 +84,16 @@ export class ProfileService {
         where: { user_id: user.id },
       });
       if (updated) {
-        return await this.getUserProfile(user.username);
+        return await this.getUserProfile(user.email);
       }
       throw new AppError("Could not update profile picture");
     } else {
       // create and save profile
       const saved = await ProfileModel.create(profileData);
       if (saved && user.setProfile(saved)) {
-        return await this.getUserProfile(user.username);
+        return await this.getUserProfile(user.email);
       }
       throw new AppError("Could not update profile picture");
     }
-    // eed
   };
 }
