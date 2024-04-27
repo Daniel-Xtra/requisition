@@ -4,8 +4,8 @@
   "description": "requistion's api built on TypeScript",
   "main": "./dist/index.js",
   "scripts": {
-    "tsc": "./node_modules/typescript/bin/tsc",
-    "post-install": "mkdir ./logs && npm run tsc",
+    "build": "./node_modules/typescript/bin/tsc",
+    "post-install": "mkdir ./logs",
     "compile": "tsc",
     "start": "tsc && node ./dist",
     "watch": "nodemon",
