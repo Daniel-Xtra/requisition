@@ -1,1 +1,1 @@
-worker: node index.js --port=$PORT
+web:  --port=$PORT
