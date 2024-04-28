@@ -1,8 +1,11 @@
 import { UserModel } from "./userModel";
 import { AppError } from "../../utils/app-error";
 import { ProfileModel } from "../Profile";
-
+//import generateSha1Hash from "sha1";
 import { USER_EXCLUDES } from "../../utils/helpers";
+import { DivisionModel } from "../Division";
+import bcryptjs from "bcryptjs";
+import { IPassword } from "./IUser";
 
 export class UserService {
   /**
@@ -25,6 +28,13 @@ export class UserService {
           required: true,
           attributes: {
             exclude: ["updated_at", "deleted_at", "userId"],
+          },
+        },
+        {
+          model: DivisionModel,
+          required: true,
+          attributes: {
+            exclude: ["updated_at", "deleted_at", "created_at"],
           },
         },
       ],
@@ -94,5 +104,27 @@ export class UserService {
     } catch (error) {
       throw new AppError(error.message || "Could not delete user account");
     }
+  };
+
+  /**
+   * changePassword
+   */
+  public changePassword = async (user: any, data: IPassword) => {
+    const users = await UserModel.findOne({ where: { email: user.email } });
+
+    if (users) {
+      let validate = await bcryptjs.compare(data.old_password, user.password);
+      if (!validate) {
+        throw new AppError("Old password incorrect");
+      } else {
+        const passwordHash = bcryptjs.hashSync(data.new_password, 10);
+        const updated = await UserModel.update(
+          { password: passwordHash, pass_updated: 1 },
+          { where: { email: user.email } }
+        );
+        return updated;
+      }
+    }
+    throw new AppError("user not found", null, 404);
   };
 }

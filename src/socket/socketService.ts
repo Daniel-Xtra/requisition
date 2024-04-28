@@ -1,8 +1,14 @@
 import { logger } from "../utils/logger";
 import { USER_EXCLUDES } from "../utils/helpers";
 import { UserModel, UserConnectionsModel } from "../api/User";
+import { RequestService } from "../api/Request/requestService";
+import { IctService } from "../api/ICT/ictService";
+import { StoreService } from "../api/Store/storeService";
 
 export class SocketService {
+  private _request = new RequestService();
+  private _ict = new IctService();
+  private _store = new StoreService();
   /**
    * New socket connection
    * @param {String} email
@@ -22,6 +28,23 @@ export class SocketService {
 
     if (user) {
       user = user.toJSON();
+      const connectedBefore = await this.getUserConnections(user.id);
+      if (connectedBefore) {
+        let destroyed = await UserConnectionsModel.destroy({
+          where: { user_id: user.id },
+          force: true,
+        });
+        if (destroyed) {
+          const connectionData = { socket_id, user_id: user.id };
+          // add user socket id
+          const connectionSaved = await UserConnectionsModel.create(
+            connectionData
+          );
+          if (connectionSaved) {
+            return user;
+          }
+        }
+      }
       const userConnectionExist = await this.getUser(socket_id);
       if (userConnectionExist) {
         return user;
@@ -52,6 +75,7 @@ export class SocketService {
    */
   public join = async (socket_id: string) => {
     let user = await this.getUser(socket_id);
+
     if (user) {
       user.user.toJSON();
       return user.user;
@@ -78,6 +102,74 @@ export class SocketService {
 
       logger.error("Could not message");
     }
+  };
+
+  public ictReview = async (socket_id, unique_id: any) => {
+    const user = await this.getUser(socket_id);
+    if (user) {
+      if (user.user) {
+        const request = await this._request.fetchRequest(unique_id);
+        const store = await this._store.allRequest("store_pending");
+        const ict = await this._ict.allRequest();
+        if (request) {
+          const recipientConnection = await this.getUserConnections(
+            request.requested_by
+          );
+          if (recipientConnection && recipientConnection.length > 0) {
+            return {
+              message: request,
+              ictMesage: ict,
+              storeMessage: store.count,
+              to_sockets: recipientConnection,
+            };
+          }
+        }
+        return {
+          message: "Could not send message.",
+          to_socket: null,
+          status: false,
+        };
+      }
+      return {
+        message: "Could not send message.",
+        to_socket: null,
+        status: false,
+      };
+    }
+    logger.error("An error occurred while trying to send your message");
+  };
+
+  public storeReview = async (socket_id, unique_id: any) => {
+    const user = await this.getUser(socket_id);
+    if (user) {
+      if (user.user) {
+        const request = await this._request.fetchRequest(unique_id);
+        const store = await this._store.allRequest("store_pending");
+        if (request) {
+          const recipientConnection = await this.getUserConnections(
+            request.requested_by
+          );
+          if (recipientConnection && recipientConnection.length > 0) {
+            return {
+              message: request,
+              count: store.count,
+              to_sockets: recipientConnection,
+            };
+          }
+        }
+        return {
+          message: "Could not send message.",
+          to_socket: null,
+          status: false,
+        };
+      }
+      return {
+        message: "Could not send message.",
+        to_socket: null,
+        status: false,
+      };
+    }
+    logger.error("An error occurred while trying to send your message");
   };
 
   public getUserConnections = async (user_id: number) => {

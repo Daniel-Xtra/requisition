@@ -9,7 +9,7 @@ import {
 } from "../../utils/helpers";
 import { DivisionModel } from "../Division";
 
-import { IUser, UserModel } from "../User";
+import { UserModel } from "../User";
 import { IRequest, IRequests } from "./IRequest";
 import { RequestModel } from "./requestModel";
 
@@ -176,7 +176,7 @@ export class RequestService {
    * @param {String} to
    */
   public individualRequest = async (
-    user: IUser,
+    user: any,
     sort_by: "all",
     page_no = 0,
     per_page = 15,
@@ -299,5 +299,26 @@ export class RequestService {
       rows: requests,
     };
     return getPagingData(data, page_no, limit);
+  };
+
+  public analysis = async (user: any) => {
+    const ict = await RequestModel.findAndCountAll({
+      where: {
+        [Op.and]: [{ status: "ict_pending" }, { requested_by: user.id }],
+      },
+    });
+    const store = await RequestModel.findAndCountAll({
+      where: {
+        [Op.and]: [{ status: "store_pending" }, { requested_by: user.id }],
+      },
+    });
+    const issued = await RequestModel.findAndCountAll({
+      where: { [Op.and]: [{ status: "issued" }, { requested_by: user.id }] },
+    });
+    return {
+      ict_pending: ict.count,
+      store_pending: store.count,
+      issued: issued.count,
+    };
   };
 }

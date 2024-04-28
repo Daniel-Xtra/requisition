@@ -3,6 +3,7 @@ import { authorize, adminAuthorize, authorizeICT } from "./authorization";
 import errorHandler from "./errorHandler";
 import global from "./global";
 import { loginStrategy, signupStrategy, adminLoginStrategy } from "./passport";
+import { FrontendAssetsUpload } from "./uploads";
 import { validation } from "./validation";
 
 export {
@@ -15,4 +16,5 @@ export {
   adminLoginStrategy,
   adminAuthorize,
   authorizeICT,
+  FrontendAssetsUpload,
 };

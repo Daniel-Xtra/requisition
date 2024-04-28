@@ -17,3 +17,7 @@ export const ALTER_STATE = process.env.ALTER_STATE;
 
 export const GMAIL_USERNAME = process.env.GMAIL_USERNAME;
 export const GMAIL_PASSWORD = process.env.GMAIL_PASSWORD;
+
+export const CLOUD_NAME = process.env.CLOUD_NAME;
+export const API_KEY = process.env.API_KEY;
+export const API_SECRET = process.env.API_SECRET;

@@ -1,6 +1,9 @@
 import crypto from "crypto";
 import slugify from "slugify";
 import * as generate from "otp-generator";
+import nodeFs from "fs";
+import bluebird from "bluebird";
+const fs = bluebird.promisifyAll(nodeFs);
 
 export const getMomentTimeDiff = async (arr: any) => {
   let datenow = new Date().getTime();
@@ -10,12 +13,22 @@ export const getMomentTimeDiff = async (arr: any) => {
   return duration;
 };
 
+export const mkdirP = async (directory) => {
+  try {
+    return await fs.mkdirAsync(directory);
+  } catch (error) {
+    if (error.code != "EEXIST") {
+      throw error;
+    }
+  }
+};
+
 /**
  * user excludes
  */
 
 export const USER_EXCLUDES = [
-  "phone_number",
+  // "phone_number",
   "password",
   "date_of_birth",
   "email_verification_code",
@@ -91,10 +104,10 @@ export const getPagination = (page, per_page) => {
 
 export const getPagingData = (data, page, limit) => {
   const count = data.count;
-  const list = data.rows;
+  const results = data.rows;
   const currentPage = page ? +page : 1;
   const totalPages = Math.ceil(count / limit);
-  return { count, list, totalPages, currentPage };
+  return { count, results, totalPages, currentPage };
 };
 
 export const generateOTP = () => {
