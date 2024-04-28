@@ -13,7 +13,7 @@ router.use(validation(DivisionValidationSchema));
 
 router.post(
   "/",
-  adminAuthorize,
+
   call(Division.createDivision, (req, res, next) => [req.body])
 );
 
@@ -31,7 +31,7 @@ router.delete(
 
 router.get(
   "/",
-  authorize,
+
   call(Division.getDivisions, (req, res, next) => [])
 );
 
