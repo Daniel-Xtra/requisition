@@ -96,7 +96,7 @@ UserModel.init(
 
 const options: any = { alter: ALTER_STATE };
 
-UserModel.hasOne(DivisionModel);
+UserModel.belongsTo(DivisionModel);
 DivisionModel.hasMany(UserModel);
 
 // force: true will drop the table if it already exists
