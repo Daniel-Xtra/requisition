@@ -26,4 +26,8 @@ export const DB = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     idle: 10000,
     evict: 60000,
   },
+  retry: {
+    match: [/Deadlock/i],
+    max: 7, // Maximum rety 3 times
+  },
 });
