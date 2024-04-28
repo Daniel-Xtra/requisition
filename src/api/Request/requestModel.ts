@@ -1,7 +1,7 @@
 import Sequelize, { Model } from "sequelize";
 import { DB } from "../../shared/database";
 import { logger } from "../../utils/logger";
-import { ALTER_STATE } from "../../config";
+//import { ALTER_STATE } from "../../config";
 import { UserModel } from "../User/userModel";
 import { DivisionModel } from "../Division";
 
@@ -85,11 +85,11 @@ UserModel.hasMany(RequestModel, { foreignKey: "requested_by" });
 
 RequestModel.belongsTo(UserModel, { foreignKey: "requested_by" });
 
-const options: any = {
-  alter: ALTER_STATE,
-};
+// const options: any = {
+//   alter: ALTER_STATE,
+// };
 
-RequestModel.sync(options).then(() => {
+RequestModel.sync().then(() => {
   logger.info("Requests table migrated");
   // Table created
 });
