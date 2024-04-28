@@ -3,7 +3,7 @@ import { DB } from "../../shared/database";
 import { logger } from "../../utils/logger";
 
 //import { ALTER_STATE } from "../../config";
-// import { DivisionModel } from "../Division";
+import { DivisionModel } from "../Division";
 
 export class UserModel extends Model {}
 UserModel.init(
@@ -96,8 +96,8 @@ UserModel.init(
 
 //const options: any = { alter: ALTER_STATE };
 
-// UserModel.hasOne(DivisionModel);
-// DivisionModel.hasMany(UserModel);
+UserModel.hasOne(DivisionModel);
+DivisionModel.hasMany(UserModel);
 
 // force: true will drop the table if it already exists
 UserModel.sync().then(() => {
