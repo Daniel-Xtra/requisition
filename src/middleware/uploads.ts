@@ -1,14 +1,14 @@
 import multer from "multer";
 
-import { mkdirP } from "../utils/helpers";
+// import { mkdirP } from "../utils/helpers";
 import { AppError } from "../utils/app-error";
 
 export const FrontendAssetsUpload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
-      mkdirP("public");
-      mkdirP("public/categories");
-      cb(null, "./public/categories/");
+      // mkdirP("public");
+      // mkdirP("public/categories");
+      // cb(null, "./public/categories/");
     },
     filename: function (req, file, cb) {
       const fileName = file.fieldname;
