@@ -1,7 +1,7 @@
 import Sequelize, { Model } from "sequelize";
 import { DB } from "../../shared/database";
 import { logger } from "../../utils/logger";
-import { ALTER_STATE } from "../../config";
+// import { ALTER_STATE } from "../../config";
 
 export class DivisionModel extends Model {}
 DivisionModel.init(
@@ -34,12 +34,12 @@ DivisionModel.init(
   }
 );
 
-const options: any = {
-  alter: ALTER_STATE,
-};
+// const options: any = {
+//   alter: ALTER_STATE,
+// };
 
 // force: true will drop the table if it already exists
-DivisionModel.sync(options).then(() => {
+DivisionModel.sync().then(() => {
   logger.info("Divisions table migrated");
   // Table created
 });
