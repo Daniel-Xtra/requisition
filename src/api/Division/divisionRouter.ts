@@ -31,7 +31,6 @@ router.delete(
 
 router.get(
   "/",
-
   call(Division.getDivisions, (req, res, next) => [])
 );
 

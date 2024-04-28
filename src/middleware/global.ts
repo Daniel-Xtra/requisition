@@ -5,6 +5,7 @@ import logger from "morgan";
 import passport from "passport";
 import { jwtStrategy } from "./passport";
 import express = require("express");
+//import path from "path";
 
 export default (app: Express) => {
   app.use(cors({ maxAge: 1728000 }));
@@ -12,7 +13,7 @@ export default (app: Express) => {
   app.use(bodyParser.json());
   app.use(logger("dev"));
 
-  app.use(express.static("src/views/imgs"));
-
+  // app.use(express.static("src/views/imgs"));
+  app.use("/photo", express.static("public/categories"));
   passport.use(jwtStrategy);
 };

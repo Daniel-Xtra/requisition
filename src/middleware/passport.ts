@@ -11,6 +11,7 @@ import { AppError } from "./../utils/app-error";
 import { ProfileModel } from "../api/Profile";
 import { IUserModel } from "../interfaces";
 import { Op } from "sequelize";
+import { DivisionModel } from "../api/Division";
 //import validator from "validator";
 
 /**
@@ -37,6 +38,7 @@ export const signupStrategy = new localStrategy(
         "gender",
         "membership_type",
         "current_position",
+        "division",
       ]);
 
       // TODO: check for username , phone number and email address
@@ -58,7 +60,13 @@ export const signupStrategy = new localStrategy(
           );
         }
       }
+      const divisionExist = await DivisionModel.findOne({
+        where: { slug: body.division },
+      });
 
+      if (!divisionExist) {
+        return done(new AppError(`Division not found`));
+      }
       const passwordHash = bcryptjs.hashSync(password, 10);
 
       // create new user
@@ -66,7 +74,7 @@ export const signupStrategy = new localStrategy(
         email,
         password: passwordHash,
         membership_type: "staff",
-
+        divisionId: divisionExist.id,
         pass_updated: 1,
         ...body,
       });

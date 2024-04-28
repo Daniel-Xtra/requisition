@@ -1,15 +1,15 @@
 import express from "express";
-import { authorize, validation } from "../../middleware";
+import { authorize } from "../../middleware";
 import { controllerHandler } from "../../shared/controllerHandler";
 import { UserController } from "./userController";
-import { UserValidationSchema } from "./userValidation";
+//import { UserValidationSchema } from "./userValidation";
 
 const router = express.Router();
 const call = controllerHandler;
 const User = new UserController();
 
 router.use(authorize);
-router.use(validation(UserValidationSchema));
+//router.use(validation(UserValidationSchema));
 
 router.get(
   "/",
@@ -29,6 +29,11 @@ router.get(
 router.delete(
   "/delete-account/:username",
   call(User.deleteAccount, (req, res, next) => [req.params.username])
+);
+
+router.put(
+  "/",
+  call(User.changePassword, (req, _res, _next) => [req.user, req.body])
 );
 
 export const UserRouter = router;
