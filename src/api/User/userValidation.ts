@@ -12,5 +12,6 @@ export const UserValidationSchema = Joi.object().keys(<IUser>{
   gender: Joi.string(),
   current_position: Joi.string(),
   membership_type: Joi.string(),
+  division: Joi.string(),
   email_verification_code: Joi.string(),
 });

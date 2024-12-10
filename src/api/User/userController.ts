@@ -1,4 +1,5 @@
 import { BaseController } from "../baseController";
+import { IPassword } from "./IUser";
 import { UserService } from "./userService";
 
 /**
@@ -41,5 +42,10 @@ export class UserController extends BaseController {
   public deleteAccount = async (username: string) => {
     const deleteUSer = await this._userService.deleteUserAccount(username);
     return this.sendResponse(deleteUSer);
+  };
+
+  public changePassword = async (user: any, data: IPassword) => {
+    const change = await this._userService.changePassword(user, data);
+    return this.sendResponse(change);
   };
 }

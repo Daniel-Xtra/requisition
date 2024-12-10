@@ -11,5 +11,11 @@ export interface IUser extends IBaseInterface {
   gender: any;
   membership_type: any;
   current_position: any;
+  division: any;
   email_verification_code: any;
+}
+
+export interface IPassword extends IBaseInterface {
+  old_password: any;
+  new_password: any;
 }

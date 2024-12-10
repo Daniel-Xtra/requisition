@@ -3,6 +3,7 @@ import { authorize, validation } from "../../middleware";
 import { controllerHandler } from "../../shared/controllerHandler";
 import { ProfileController } from "./profileController";
 import { ProfileValidationSchema } from "./profileValidation";
+import { FrontendAssetsUpload } from "../../middleware/uploads";
 
 const router = express.Router();
 const call = controllerHandler;
@@ -26,7 +27,10 @@ router.put(
   call(Profile.editProfile, (req, res, next) => [req.user, req.body])
 );
 
-// router.post("/upload", [ProfilePhotoUpload.single("photo")],
-//     call(Profile.saveProfilePhoto, (req, res, next) => [req.user, req.file]));
+router.post(
+  "/upload",
+  [FrontendAssetsUpload.single("photo")],
+  call(Profile.saveProfilePhoto, (req, res, next) => [req.user, req.file])
+);
 
 export const ProfileRouter = router;

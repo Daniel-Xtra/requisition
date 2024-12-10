@@ -64,4 +64,9 @@ export class RequestController extends BaseController {
     );
     return this.sendResponse(all);
   };
+
+  public requestAnalyse = async (user: any) => {
+    const analyse = await this._requestService.analysis(user);
+    return this.sendResponse(analyse);
+  };
 }

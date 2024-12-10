@@ -57,4 +57,10 @@ router.get(
   call(Request.individualRequest, (req, res, next) => [req.user, req.query])
 );
 
+router.get(
+  "/request-analysis",
+  authorize,
+  call(Request.requestAnalyse, (req, _res, _next) => [req.user])
+);
+
 export const RequestRouter = router;

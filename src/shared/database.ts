@@ -20,10 +20,14 @@ export const DB = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     underscored: true,
   },
   pool: {
-    max: 10,
+    max: 100,
     min: 0,
     acquire: 600000,
     idle: 10000,
     evict: 60000,
+  },
+  retry: {
+    match: [/Deadlock/i],
+    max: 7, // Maximum rety 3 times
   },
 });

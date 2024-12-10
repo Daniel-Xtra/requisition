@@ -16,6 +16,7 @@ export const SignupValidationSchema = Joi.object().keys({
   current_position: Joi.string().allow("").optional(),
   membership_type: Joi.string().optional(),
   code: Joi.string(),
+  division: Joi.string().required(),
 });
 
 export const RefreshTokensValidationSchema = Joi.object().keys({
